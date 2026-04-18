@@ -1,0 +1,1144 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>🍌 Бананчики — учёт мерча</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            user-select: none;
+        }
+        
+        /* ========== ЖЁЛТО-ОРАНЖЕВАЯ СВЕТЛАЯ ТЕМА ========== */
+        :root {
+            --bg-color: #fff5e0;          /* тёплый ванильный фон */
+            --card-bg: #ffffff;
+            --text-primary: #5a3a1a;      /* карамельно-коричневый */
+            --text-secondary: #e67e22;    /* сочный оранжевый */
+            --text-muted: #b87c4a;
+            --border-color: #ffe0a3;      /* нежно-золотистый */
+            --badge-bg: #fff0d0;
+            --badge-text: #c25d1a;
+            --stock-color: #f39c12;
+            --price-color: #e67e22;
+            --revenue-color: #d35400;
+            --minus-bg: #ffe6e5;
+            --minus-color: #e67e22;
+            --plus-bg: #fff0d0;
+            --plus-color: #f39c12;
+            --btn-bg: #f39c12;
+            --footer-bg: white;
+            --shadow: rgba(0,0,0,0.08);
+            --select-border: #ffe0a3;
+            --reset-bg: #fff0d0;
+            --reset-color: #e67e22;
+            --progress-bg: #ffe0a3;
+            --progress-bar: #f39c12;
+            --modal-bg: white;
+            --modal-overlay: rgba(0,0,0,0.7);
+            --checkbox-bg: white;
+        }
+        
+        /* ========== ЖЁЛТО-ОРАНЖЕВАЯ ТЁМНАЯ ТЕМА (золотисто-угольная) ========== */
+        body.dark {
+            --bg-color: #1e1708;          /* тёмно-угольный с золотым отливом */
+            --card-bg: #2a2110;
+            --text-primary: #f5e6c4;
+            --text-secondary: #f39c12;
+            --text-muted: #b87c4a;
+            --border-color: #4a3a1a;
+            --badge-bg: #3a2a10;
+            --badge-text: #f1c40f;
+            --stock-color: #f39c12;
+            --price-color: #e67e22;
+            --revenue-color: #e67e22;
+            --minus-bg: #3a2018;
+            --minus-color: #e67e22;
+            --plus-bg: #3a2a10;
+            --plus-color: #f1c40f;
+            --btn-bg: #e67e22;
+            --footer-bg: #1e1708;
+            --shadow: rgba(0,0,0,0.5);
+            --select-border: #4a3a1a;
+            --reset-bg: #3a2a10;
+            --reset-color: #f1c40f;
+            --progress-bg: #2a1e0a;
+            --progress-bar: #f39c12;
+            --modal-bg: #2a2110;
+            --modal-overlay: rgba(0,0,0,0.95);
+            --checkbox-bg: #2a2110;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg-color);
+            margin: 0;
+            padding: 12px;
+            padding-bottom: 40px;
+            transition: background 0.3s ease, color 0.2s ease;
+        }
+        
+        .theme-toggle {
+            position: fixed;
+            top: 12px;
+            right: 12px;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 30px;
+            width: 40px;
+            height: 40px;
+            font-size: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1500;
+            box-shadow: 0 2px 8px var(--shadow);
+            transition: all 0.2s ease;
+        }
+        .theme-toggle:active {
+            transform: scale(0.95);
+        }
+        
+        h1 {
+            font-size: 22px;
+            margin: 0 0 4px 0;
+            color: var(--badge-text);
+        }
+        .sub {
+            color: var(--text-secondary);
+            margin-bottom: 16px;
+            font-size: 13px;
+        }
+        
+        .progress-container {
+            width: 100%;
+            background: var(--progress-bg);
+            border-radius: 20px;
+            margin-bottom: 12px;
+            overflow: hidden;
+            display: none;
+        }
+        .progress-bar {
+            width: 0%;
+            height: 4px;
+            background: var(--progress-bar);
+            border-radius: 20px;
+            transition: width 0.2s ease;
+        }
+        .progress-container.active {
+            display: block !important;
+        }
+        
+        .search-panel {
+            margin-bottom: 12px;
+        }
+        .search-input {
+            width: 100%;
+            padding: 10px 14px;
+            font-size: 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 30px;
+            background: var(--card-bg);
+            color: var(--text-primary);
+            margin-bottom: 8px;
+            outline: none;
+            box-sizing: border-box;
+        }
+        .search-input::placeholder {
+            color: var(--text-muted);
+        }
+        .filter-row {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        
+        /* Кастомный мультиселект */
+        .custom-select {
+            flex: 1;
+            position: relative;
+            min-width: 0;
+        }
+        .custom-select-trigger {
+            background: var(--card-bg);
+            border: 1px solid var(--select-border);
+            border-radius: 30px;
+            padding: 8px 28px 8px 12px;
+            font-size: 13px;
+            cursor: pointer;
+            position: relative;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            color: var(--text-primary);
+        }
+        .custom-select-trigger:after {
+            content: '▼';
+            font-size: 8px;
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+        }
+        .custom-select-dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: var(--card-bg);
+            border: 1px solid var(--select-border);
+            border-radius: 16px;
+            z-index: 100;
+            display: none;
+            max-height: 300px;
+            overflow-y: auto;
+            margin-top: 4px;
+            box-shadow: 0 4px 12px var(--shadow);
+        }
+        .custom-select-dropdown.show {
+            display: block;
+        }
+        
+        .filter-option-header {
+            padding: 8px 12px;
+            border-bottom: 1px solid var(--border-color);
+            font-weight: 600;
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+        
+        .filter-option {
+            padding: 8px 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            transition: background 0.1s;
+        }
+        .filter-option:hover {
+            background: var(--badge-bg);
+        }
+        .filter-option input {
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+            accent-color: var(--btn-bg);
+        }
+        .filter-option label {
+            flex: 1;
+            cursor: pointer;
+            font-size: 13px;
+            color: var(--text-primary);
+        }
+        
+        .sort-option {
+            padding: 10px 12px;
+            cursor: pointer;
+            transition: background 0.1s;
+            font-size: 13px;
+            color: var(--text-primary);
+        }
+        .sort-option:hover {
+            background: var(--badge-bg);
+        }
+        
+        .reset-btn {
+            background: var(--reset-bg);
+            color: var(--reset-color);
+            border: none;
+            border-radius: 30px;
+            width: 36px;
+            height: 36px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        .reset-btn:active {
+            transform: scale(0.96);
+        }
+        
+        .card {
+            background: var(--card-bg);
+            border-radius: 14px;
+            margin-bottom: 10px;
+            padding: 10px 12px;
+            box-shadow: 0 1px 4px var(--shadow);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+        }
+        .info {
+            flex: 3;
+            min-width: 120px;
+        }
+        
+        .title-row {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-wrap: wrap;
+            margin-bottom: 4px;
+        }
+        .type-badge {
+            display: inline-block;
+            background: var(--badge-bg);
+            padding: 2px 8px;
+            border-radius: 16px;
+            font-size: 11px;
+            font-weight: 500;
+            color: var(--badge-text);
+            line-height: 1.3;
+            white-space: nowrap;
+        }
+        .name {
+            font-weight: bold;
+            font-size: 22px;
+            color: var(--text-primary);
+            line-height: 1.2;
+            transform: translateY(1px);
+        }
+        
+        .stock {
+            font-size: 20px;
+            font-weight: bold;
+            color: var(--stock-color);
+            margin-top: 0;
+            margin-bottom: 3px;
+        }
+        
+        .total, .price, .revenue {
+            font-size: 11px;
+            font-weight: 500;
+            margin-top: 0;
+            margin-bottom: 2px;
+            line-height: 1.3;
+        }
+        .total {
+            color: var(--text-muted);
+        }
+        .price {
+            color: var(--price-color);
+        }
+        .revenue {
+            color: var(--revenue-color);
+        }
+        
+        .buttons {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        button {
+            font-size: 24px;
+            font-weight: bold;
+            width: 54px;
+            height: 54px;
+            border-radius: 27px;
+            border: none;
+            cursor: pointer;
+            transition: 0.1s;
+            box-shadow: 0 1px 3px var(--shadow);
+        }
+        button:active {
+            transform: scale(0.96);
+        }
+        .minus {
+            background: var(--minus-bg);
+            color: var(--minus-color);
+        }
+        .plus {
+            background: var(--plus-bg);
+            color: var(--plus-color);
+        }
+        
+        .refresh-btn, .history-btn {
+            background: var(--btn-bg);
+            color: white;
+            width: auto;
+            height: auto;
+            padding: 8px 18px;
+            font-size: 14px;
+            font-weight: 500;
+            border-radius: 30px;
+            margin-bottom: 12px;
+            border: none;
+            box-shadow: none;
+        }
+        
+        .loading {
+            text-align: center;
+            color: var(--text-muted);
+            padding: 30px;
+            font-size: 14px;
+        }
+        .footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: var(--footer-bg);
+            padding: 8px 10px;
+            text-align: center;
+            border-top: 1px solid var(--border-color);
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+        .last-update {
+            font-size: 10px;
+            color: var(--text-muted);
+            text-align: center;
+            margin-top: 8px;
+            margin-bottom: 4px;
+        }
+        .auto-refresh-badge {
+            font-size: 9px;
+            color: var(--text-muted);
+            text-align: center;
+            margin-top: 0;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            transition: opacity 0.2s ease;
+        }
+        .auto-refresh-badge .dot {
+            width: 6px;
+            height: 6px;
+            background-color: var(--stock-color);
+            border-radius: 50%;
+            display: inline-block;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { opacity: 0.3; transform: scale(0.8); }
+            50% { opacity: 1; transform: scale(1.2); }
+            100% { opacity: 0.3; transform: scale(0.8); }
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--modal-overlay);
+            z-index: 1000;
+            overflow-y: auto;
+        }
+        .modal-content {
+            background: var(--modal-bg);
+            margin: 20px;
+            border-radius: 20px;
+            padding: 20px;
+            max-height: 85vh;
+            overflow-y: auto;
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            font-size: 18px;
+            font-weight: bold;
+            color: var(--badge-text);
+        }
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 26px;
+            cursor: pointer;
+            width: 36px;
+            height: 36px;
+            box-shadow: none;
+            color: var(--text-muted);
+        }
+        .history-item {
+            border-bottom: 1px solid var(--border-color);
+            padding: 10px 0;
+        }
+        .history-date {
+            font-size: 10px;
+            color: var(--text-muted);
+        }
+        .history-name {
+            font-weight: bold;
+            font-size: 15px;
+            color: var(--text-primary);
+        }
+        .history-sale {
+            color: var(--minus-color);
+            font-size: 13px;
+        }
+        .history-return {
+            color: var(--stock-color);
+            font-size: 13px;
+        }
+        
+        .login-card {
+            background: var(--card-bg);
+            border: 2px solid var(--border-color);
+        }
+        .login-card h2 {
+            color: var(--badge-text);
+        }
+        .login-card input {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+        }
+        .login-card input::placeholder {
+            color: var(--text-muted);
+        }
+        
+        @media (min-width: 768px) {
+            .title-row {
+                margin-bottom: 2px;
+            }
+            .name {
+                transform: translateY(-1px);
+                font-size: 24px;
+            }
+            .stock {
+                font-size: 22px;
+            }
+            .card {
+                padding: 12px;
+            }
+        }
+        
+        @media (max-width: 500px) {
+            button {
+                width: 48px;
+                height: 48px;
+                font-size: 22px;
+            }
+            .name {
+                font-size: 18px;
+                transform: translateY(1px);
+            }
+            .stock {
+                font-size: 18px;
+            }
+            .type-badge {
+                font-size: 10px;
+                padding: 1px 6px;
+            }
+            .custom-select-trigger {
+                padding: 8px 24px 8px 10px;
+                font-size: 12px;
+            }
+            .theme-toggle {
+                top: 8px;
+                right: 8px;
+                width: 36px;
+                height: 36px;
+                font-size: 18px;
+            }
+            .filter-option label {
+                font-size: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <button class="theme-toggle" id="themeToggle" title="Сменить тему">🌙</button>
+    
+    <div id="loginOverlay" class="login-overlay" style="position: fixed; top:0; left:0; width:100%; height:100%; background:var(--bg-color); z-index:2000; display:flex; align-items:center; justify-content:center;">
+        <div class="login-card" style="background:var(--card-bg); border-radius:24px; padding:32px 24px; width:280px; text-align:center; box-shadow:0 8px 24px var(--shadow);">
+            <h2 style="color:var(--badge-text); margin-bottom:20px;">🍌 Вход в Бананчики 🍌</h2>
+            <input type="password" id="passwordInput" style="width:100%; padding:12px; font-size:16px; border:1px solid var(--border-color); border-radius:30px; outline:none; margin-bottom:16px; text-align:center; box-sizing:border-box; background:var(--card-bg); color:var(--text-primary);" placeholder="Введите пароль" autofocus>
+            <button id="loginBtn" style="background:var(--btn-bg); color:white; border:none; border-radius:30px; padding:12px 24px; font-size:16px; font-weight:500; width:100%; cursor:pointer;">🍌 Войти 🍌</button>
+            <div id="errorMsg" style="color:var(--minus-color); font-size:12px; margin-top:12px; display:none;">Не тот бананчик! Попробуй ещё 🍌</div>
+        </div>
+    </div>
+
+    <div id="mainContent" style="display:none;">
+        <h1>🍌 Бананчики — учёт мерча 🍌</h1>
+        <div class="sub">Всё на благо банановой республики! 🍌✨</div>
+        
+        <div style="display: flex; gap: 10px; margin-bottom: 12px;">
+            <button class="refresh-btn" onclick="loadData(true, true)">🔄 Обновить</button>
+            <button class="history-btn" onclick="showHistory()">📜 История</button>
+        </div>
+        
+        <div id="progressContainer" class="progress-container">
+            <div id="progressBar" class="progress-bar"></div>
+        </div>
+        
+        <div class="search-panel">
+            <input type="text" id="searchInput" class="search-input" placeholder="Поиск бананчика по названию... 🍌">
+            
+            <div class="filter-row">
+                <!-- Мультиселект для типов -->
+                <div class="custom-select" id="typeFilterContainer">
+                    <div class="custom-select-trigger" id="typeFilterTrigger">Все типы мерча</div>
+                    <div class="custom-select-dropdown" id="typeFilterDropdown"></div>
+                </div>
+                
+                <!-- Селект для сортировки -->
+                <div class="custom-select" id="sortByContainer">
+                    <div class="custom-select-trigger" id="sortByTrigger">Без сортировки</div>
+                    <div class="custom-select-dropdown" id="sortByDropdown"></div>
+                </div>
+                
+                <button id="resetFilters" class="reset-btn" title="Сбросить фильтры">✕</button>
+            </div>
+        </div>
+        
+        <div id="cards-container">
+            <div class="loading">Загрузка бананчиков... 🍌</div>
+        </div>
+        <div class="last-update" id="update-time"></div>
+        <div class="auto-refresh-badge">
+            <span class="dot"></span>
+            <span>Автообновление каждую минуту</span>
+        </div>
+        <div class="footer">
+            Намяукано бананом 🍌 | <a href="https://docs.google.com/spreadsheets/d/123whYLgKX3E7a_Ov9X44sOe1TrlA5aifjtYanTsn7xk/edit?gid=0#gid=0" target="_blank" rel="noopener noreferrer" style="color: var(--text-muted); text-decoration: underline;">Синхронизация с таблицей</a>
+        </div>
+    </div>
+
+    <div id="historyModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span>📜 История банановых операций</span>
+                <button class="close-btn" onclick="closeHistory()">×</button>
+            </div>
+            <div id="history-list">
+                <div class="loading">Загрузка истории...</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = "https://script.google.com/macros/s/AKfycbw-QMM6PtyGZiUMcbWi8nJnfNTyGtDMVbNQ1ftKXLEi2jrc_IB0Y-TziVm4M7DaQ7-exw/exec";
+        const CORRECT_PASSWORD = "банан";   // 🍌 новый пароль
+        
+        let originalCardsData = [];
+        let currentFilteredData = [];
+        let isLoading = false;
+        let autoRefreshInterval = null;
+        
+        let selectedTypes = new Set();
+        let currentSortBy = "none";
+        let typeOptions = [];
+        
+        // ========== ТЁМНАЯ ТЕМА ==========
+        function initTheme() {
+            const savedTheme = localStorage.getItem('merch_theme');
+            const themeToggle = document.getElementById('themeToggle');
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark');
+                if (themeToggle) themeToggle.textContent = '☀️';
+            } else {
+                document.body.classList.remove('dark');
+                if (themeToggle) themeToggle.textContent = '🌙';
+            }
+        }
+        
+        function toggleTheme() {
+            const themeToggle = document.getElementById('themeToggle');
+            if (document.body.classList.contains('dark')) {
+                document.body.classList.remove('dark');
+                localStorage.setItem('merch_theme', 'light');
+                if (themeToggle) themeToggle.textContent = '🌙';
+            } else {
+                document.body.classList.add('dark');
+                localStorage.setItem('merch_theme', 'dark');
+                if (themeToggle) themeToggle.textContent = '☀️';
+            }
+        }
+        
+        function updateTypeFilterTrigger() {
+            const trigger = document.getElementById('typeFilterTrigger');
+            if (!trigger) return;
+            if (selectedTypes.size === 0) {
+                trigger.textContent = 'Все типы мерча';
+            } else if (selectedTypes.size === 1) {
+                trigger.textContent = Array.from(selectedTypes)[0];
+            } else {
+                trigger.textContent = `Выбрано: ${selectedTypes.size}`;
+            }
+        }
+        
+        // Построение мультиселекта для типов
+        function buildTypeMultiSelect() {
+            const dropdown = document.getElementById('typeFilterDropdown');
+            if (!dropdown) return;
+            
+            dropdown.innerHTML = '<div class="filter-option-header">Выберите типы мерча</div>';
+            
+            typeOptions.forEach(type => {
+                const div = document.createElement('div');
+                div.className = 'filter-option';
+                
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.id = `type_${type}`;
+                checkbox.value = type;
+                checkbox.checked = selectedTypes.has(type);
+                checkbox.onchange = (e) => {
+                    e.stopPropagation();
+                    if (checkbox.checked) {
+                        selectedTypes.add(type);
+                    } else {
+                        selectedTypes.delete(type);
+                    }
+                    updateTypeFilterTrigger();
+                };
+                
+                const label = document.createElement('label');
+                label.htmlFor = `type_${type}`;
+                label.textContent = type;
+                
+                div.appendChild(checkbox);
+                div.appendChild(label);
+                dropdown.appendChild(div);
+            });
+            
+            const buttonsRow = document.createElement('div');
+            buttonsRow.style.display = 'flex';
+            buttonsRow.style.gap = '10px';
+            buttonsRow.style.padding = '8px 12px';
+            buttonsRow.style.borderTop = '1px solid var(--border-color)';
+            buttonsRow.style.marginTop = '4px';
+            
+            const isMobile = window.innerWidth <= 500;
+            
+            const resetBtn = document.createElement('button');
+            if (isMobile) {
+                resetBtn.textContent = '✕';
+                resetBtn.style.fontSize = '16px';
+                resetBtn.style.fontWeight = 'bold';
+            } else {
+                resetBtn.textContent = 'Сбросить';
+                resetBtn.style.fontSize = '12px';
+            }
+            resetBtn.style.flex = '1';
+            resetBtn.style.background = 'transparent';
+            resetBtn.style.border = '1px solid var(--border-color)';
+            resetBtn.style.borderRadius = '20px';
+            resetBtn.style.padding = '6px 0';
+            resetBtn.style.cursor = 'pointer';
+            resetBtn.style.color = 'var(--text-secondary)';
+            resetBtn.onclick = (e) => {
+                e.stopPropagation();
+                selectedTypes.clear();
+                document.querySelectorAll('#typeFilterDropdown input[type="checkbox"]').forEach(cb => {
+                    cb.checked = false;
+                });
+                updateTypeFilterTrigger();
+                filterAndSort();
+            };
+            
+            const applyBtn = document.createElement('button');
+            if (isMobile) {
+                applyBtn.textContent = '✓';
+                applyBtn.style.fontSize = '16px';
+                applyBtn.style.fontWeight = 'bold';
+            } else {
+                applyBtn.textContent = 'Применить';
+                applyBtn.style.fontSize = '12px';
+            }
+            applyBtn.style.flex = '1';
+            applyBtn.style.background = 'var(--btn-bg)';
+            applyBtn.style.border = 'none';
+            applyBtn.style.borderRadius = '20px';
+            applyBtn.style.padding = '6px 0';
+            applyBtn.style.cursor = 'pointer';
+            applyBtn.style.color = 'white';
+            applyBtn.onclick = (e) => {
+                e.stopPropagation();
+                filterAndSort();
+                document.getElementById('typeFilterDropdown').classList.remove('show');
+            };
+            
+            buttonsRow.appendChild(resetBtn);
+            buttonsRow.appendChild(applyBtn);
+            dropdown.appendChild(buttonsRow);
+        }
+        
+        // Кастомный селект для сортировки
+        function initSortSelect() {
+            const sortTrigger = document.getElementById('sortByTrigger');
+            const sortDropdown = document.getElementById('sortByDropdown');
+            
+            const sortOptions = [
+                { value: "none", label: "Без сортировки" },
+                { value: "name", label: "По названию" },
+                { value: "stock", label: "По остатку: сначала мало" },
+                { value: "stockDesc", label: "По остатку: сначала много" },
+                { value: "priceAsc", label: "По цене: сначала дешёвое" },
+                { value: "priceDesc", label: "По цене: сначала дорогое" },
+                { value: "type", label: "По типу" }
+            ];
+            
+            function buildSortDropdown() {
+                sortDropdown.innerHTML = '';
+                
+                const header = document.createElement('div');
+                header.className = 'filter-option-header';
+                header.textContent = 'Выберите сортировку';
+                sortDropdown.appendChild(header);
+                
+                sortOptions.forEach(opt => {
+                    const div = document.createElement('div');
+                    div.className = 'sort-option';
+                    div.style.color = currentSortBy === opt.value ? 'var(--btn-bg)' : 'var(--text-primary)';
+                    div.style.fontWeight = currentSortBy === opt.value ? '600' : 'normal';
+                    div.style.backgroundColor = currentSortBy === opt.value ? 'var(--badge-bg)' : 'transparent';
+                    div.textContent = opt.label;
+                    
+                    div.onmouseenter = () => {
+                        if (currentSortBy !== opt.value) {
+                            div.style.backgroundColor = 'var(--badge-bg)';
+                        }
+                    };
+                    div.onmouseleave = () => {
+                        if (currentSortBy !== opt.value) {
+                            div.style.backgroundColor = 'transparent';
+                        }
+                    };
+                    div.onclick = (e) => {
+                        e.stopPropagation();
+                        currentSortBy = opt.value;
+                        sortTrigger.textContent = opt.label;
+                        filterAndSort();
+                        sortDropdown.classList.remove('show');
+                    };
+                    sortDropdown.appendChild(div);
+                });
+            }
+            
+            function closeSortDropdown() {
+                sortDropdown.classList.remove('show');
+            }
+            
+            sortTrigger.onclick = (e) => {
+                e.stopPropagation();
+                sortDropdown.classList.toggle('show');
+            };
+            
+            document.addEventListener('click', () => closeSortDropdown());
+            
+            buildSortDropdown();
+        }
+        
+        function initCustomSelects() {
+            initSortSelect();
+            
+            const typeTrigger = document.getElementById('typeFilterTrigger');
+            const typeDropdown = document.getElementById('typeFilterDropdown');
+            
+            function closeTypeDropdown() {
+                typeDropdown.classList.remove('show');
+            }
+            
+            typeTrigger.onclick = (e) => {
+                e.stopPropagation();
+                typeDropdown.classList.toggle('show');
+            };
+            
+            document.addEventListener('click', () => closeTypeDropdown());
+        }
+        
+        function updateTypeOptions() {
+            const types = new Set();
+            originalCardsData.forEach(card => {
+                if (card.type && card.type.trim()) {
+                    types.add(card.type);
+                }
+            });
+            typeOptions = Array.from(types).sort();
+            
+            selectedTypes.forEach(type => {
+                if (!typeOptions.includes(type)) {
+                    selectedTypes.delete(type);
+                }
+            });
+            
+            buildTypeMultiSelect();
+            updateTypeFilterTrigger();
+        }
+        
+        function filterAndSort() {
+            let filtered = [...originalCardsData];
+            const searchText = document.getElementById('searchInput')?.value.toLowerCase() || '';
+            
+            if (searchText) {
+                filtered = filtered.filter(card => card.name.toLowerCase().includes(searchText));
+            }
+            
+            if (selectedTypes.size > 0) {
+                filtered = filtered.filter(card => selectedTypes.has(card.type));
+            }
+            
+            if (currentSortBy !== 'none') {
+                switch(currentSortBy) {
+                    case 'name': filtered.sort((a, b) => a.name.localeCompare(b.name)); break;
+                    case 'stock': filtered.sort((a, b) => (a.stock || 0) - (b.stock || 0)); break;
+                    case 'stockDesc': filtered.sort((a, b) => (b.stock || 0) - (a.stock || 0)); break;
+                    case 'priceAsc': filtered.sort((a, b) => (a.price || 0) - (b.price || 0)); break;
+                    case 'priceDesc': filtered.sort((a, b) => (b.price || 0) - (a.price || 0)); break;
+                    case 'type': filtered.sort((a, b) => (a.type || '').localeCompare(b.type || '')); break;
+                }
+            }
+            currentFilteredData = filtered;
+            renderCards();
+        }
+        
+        function renderCards() {
+            const container = document.getElementById('cards-container');
+            if (!container) return;
+            container.innerHTML = '';
+            if (currentFilteredData.length === 0) {
+                container.innerHTML = '<div class="loading">🍌 Ни одного бананчика не найдено 🍌</div>';
+                return;
+            }
+            currentFilteredData.forEach((card) => {
+                const originalIndex = originalCardsData.findIndex(orig => orig.name === card.name && orig.type === card.type);
+                const type = card.type || "";
+                const name = card.name || "Без названия";
+                const total = typeof card.total === 'number' ? card.total : 0;
+                const stock = typeof card.stock === 'number' ? card.stock : 0;
+                const price = typeof card.price === 'number' ? card.price : 0;
+                const sold = total - stock;
+                const revenue = sold * price;
+                const cardDiv = document.createElement('div');
+                cardDiv.className = 'card';
+                cardDiv.innerHTML = `
+                    <div class="info">
+                        <div class="title-row">
+                            ${type ? `<span class="type-badge">${escapeHtml(type)}</span>` : ''}
+                            <span class="name">${escapeHtml(name)}</span>
+                        </div>
+                        <div class="stock">🍌 Остаток: ${stock} шт</div>
+                        <div class="total">📦 Всего: ${total} шт</div>
+                        <div class="price">💰 Цена: ${price} ₽</div>
+                        <div class="revenue">📊 Выручка: ${revenue} ₽</div>
+                    </div>
+                    <div class="buttons">
+                        <button class="minus" data-index="${originalIndex}" data-delta="-1">−1</button>
+                        <button class="plus" data-index="${originalIndex}" data-delta="+1">+1</button>
+                    </div>
+                `;
+                container.appendChild(cardDiv);
+            });
+            document.querySelectorAll('.minus, .plus').forEach(btn => {
+                btn.removeEventListener('click', handleButtonClick);
+                btn.addEventListener('click', handleButtonClick);
+            });
+        }
+        
+        async function handleButtonClick(e) {
+            const btn = e.currentTarget;
+            const index = parseInt(btn.dataset.index);
+            const delta = parseInt(btn.dataset.delta);
+            await updateStock(index, delta);
+        }
+        
+        async function updateStock(index, delta) {
+            const card = originalCardsData[index];
+            if (!card) return;
+            const newStock = card.stock + delta;
+            if (newStock < 0) { alert("Остаток не может быть меньше 0 🍌"); return; }
+            if (newStock > card.total) { alert("Остаток не может быть больше " + card.total + " 🍌"); return; }
+            card.stock = newStock;
+            filterAndSort();
+            try {
+                const response = await fetch(`${API_URL}?action=update&row=${index}&delta=${delta}&t=${Date.now()}`);
+                const result = await response.json();
+                if (!result.success) { await loadData(true, true); alert("Ошибка: " + (result.error || "неизвестная")); }
+            } catch (error) { console.error(error); await loadData(true, true); alert("Ошибка соединения"); }
+        }
+        
+        function showUpdateTime() {
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            const timeElement = document.getElementById('update-time');
+            if (timeElement) timeElement.innerText = `Обновлено: ${timeStr} 🍌`;
+        }
+        
+        function showProgressBar() {
+            const container = document.getElementById('progressContainer');
+            const bar = document.getElementById('progressBar');
+            if (container && bar) {
+                container.style.display = 'block';
+                container.classList.add('active');
+                bar.style.width = '0%';
+                setTimeout(() => {
+                    if (bar) bar.style.width = '90%';
+                }, 50);
+            }
+        }
+        
+        function hideProgressBar() {
+            const container = document.getElementById('progressContainer');
+            const bar = document.getElementById('progressBar');
+            if (container && bar) {
+                bar.style.width = '100%';
+                setTimeout(() => {
+                    container.style.display = 'none';
+                    container.classList.remove('active');
+                    bar.style.width = '0%';
+                }, 300);
+            }
+        }
+        
+        async function loadData(showLoading = true, showProgress = false) {
+            if (isLoading) return;
+            isLoading = true;
+            
+            const isAutoRefresh = showProgress && !showLoading;
+            
+            if (!isAutoRefresh) {
+                const autoRefreshBadge = document.querySelector('.auto-refresh-badge');
+                if (autoRefreshBadge) {
+                    autoRefreshBadge.style.opacity = '0';
+                    autoRefreshBadge.style.visibility = 'hidden';
+                }
+                
+                if (showProgress) {
+                    showProgressBar();
+                }
+                
+                if (showLoading) {
+                    const container = document.getElementById('cards-container');
+                    if (container) container.innerHTML = '<div class="loading">Загрузка бананчиков... 🍌</div>';
+                }
+            }
+            
+            try {
+                const response = await fetch(API_URL + "?action=get&t=" + Date.now());
+                const data = await response.json();
+                
+                if (data && data.length > 0) {
+                    originalCardsData = data;
+                    updateTypeOptions();
+                    filterAndSort();
+                    showUpdateTime();
+                } else if (showLoading && !isAutoRefresh) {
+                    const container = document.getElementById('cards-container');
+                    if (container) container.innerHTML = '<div class="loading">Нет данных. Проверьте таблицу и лист "Мерч". 🍌</div>';
+                }
+            } catch (error) {
+                console.error(error);
+                if (showLoading && !isAutoRefresh) {
+                    const container = document.getElementById('cards-container');
+                    if (container) container.innerHTML = '<div class="loading">Ошибка загрузки. Проверьте интернет и ссылку. 🍌</div>';
+                }
+            } finally {
+                isLoading = false;
+                
+                if (!isAutoRefresh) {
+                    if (showProgress) {
+                        hideProgressBar();
+                    }
+                    
+                    const autoRefreshBadge = document.querySelector('.auto-refresh-badge');
+                    if (autoRefreshBadge) {
+                        autoRefreshBadge.style.opacity = '';
+                        autoRefreshBadge.style.visibility = '';
+                    }
+                }
+            }
+        }
+        
+        async function showHistory() {
+            const modal = document.getElementById('historyModal');
+            const historyList = document.getElementById('history-list');
+            if (!modal || !historyList) return;
+            modal.style.display = 'block';
+            historyList.innerHTML = '<div class="loading">Загрузка истории...</div>';
+            try {
+                const response = await fetch(API_URL + "?action=getHistory&t=" + Date.now());
+                const history = await response.json();
+                if (history && history.length > 0) {
+                    historyList.innerHTML = '';
+                    history.forEach(item => {
+                        const date = new Date(item.date);
+                        const dateStr = date.toLocaleString('ru-RU');
+                        const actionClass = item.action === 'Продажа' ? 'history-sale' : 'history-return';
+                        const actionSymbol = item.action === 'Продажа' ? '−' : '+';
+                        const div = document.createElement('div'); div.className = 'history-item';
+                        div.innerHTML = `<div class="history-date">${dateStr}</div><div class="history-name">🍌 ${escapeHtml(item.name)}</div><div class="${actionClass}">${item.action} ${actionSymbol}1 → остаток: ${item.newStock} шт</div>`;
+                        historyList.appendChild(div);
+                    });
+                } else { historyList.innerHTML = '<div class="loading">История пуста 🍌</div>'; }
+            } catch (error) { console.error(error); historyList.innerHTML = '<div class="loading">Ошибка загрузки истории</div>'; }
+        }
+        
+        function closeHistory() { const modal = document.getElementById('historyModal'); if (modal) modal.style.display = 'none'; }
+        function escapeHtml(str) { if (!str) return ''; return String(str).replace(/[&<>]/g, function(m) { if (m === '&') return '&amp;'; if (m === '<') return '&lt;'; if (m === '>') return '&gt;'; return m; }); }
+        window.onclick = function(event) { const modal = document.getElementById('historyModal'); if (event.target === modal) closeHistory(); }
+        function startAutoRefresh() { if (autoRefreshInterval) clearInterval(autoRefreshInterval); autoRefreshInterval = setInterval(() => { loadData(false, true); }, 60000); }
+        
+        function resetAllFilters() {
+            const searchInput = document.getElementById('searchInput');
+            if (searchInput) searchInput.value = '';
+            selectedTypes.clear();
+            updateTypeFilterTrigger();
+            document.querySelectorAll('#typeFilterDropdown input[type="checkbox"]').forEach(cb => {
+                cb.checked = false;
+            });
+            currentSortBy = 'none';
+            const sortTrigger = document.getElementById('sortByTrigger');
+            if (sortTrigger) sortTrigger.textContent = 'Без сортировки';
+            filterAndSort();
+        }
+        
+        function checkPasswordAndLogin() {
+            const passwordInput = document.getElementById('passwordInput');
+            const errorMsg = document.getElementById('errorMsg');
+            const loginOverlay = document.getElementById('loginOverlay');
+            const mainContent = document.getElementById('mainContent');
+            if (passwordInput.value === CORRECT_PASSWORD) {
+                localStorage.setItem('merch_authenticated', 'true');
+                loginOverlay.style.display = 'none';
+                mainContent.style.display = 'block';
+                initCustomSelects();
+                loadData(true, true);
+                startAutoRefresh();
+            } else { errorMsg.style.display = 'block'; passwordInput.value = ''; passwordInput.focus(); }
+        }
+        
+        function checkExistingAuth() {
+            const loginOverlay = document.getElementById('loginOverlay');
+            const mainContent = document.getElementById('mainContent');
+            if (localStorage.getItem('merch_authenticated') === 'true') {
+                loginOverlay.style.display = 'none';
+                mainContent.style.display = 'block';
+                initCustomSelects();
+                loadData(true, true);
+                startAutoRefresh();
+            } else { loginOverlay.style.display = 'flex'; mainContent.style.display = 'none'; document.getElementById('passwordInput').focus(); }
+        }
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            initTheme();
+            const themeToggle = document.getElementById('themeToggle');
+            if (themeToggle) themeToggle.addEventListener('click', toggleTheme);
+            const loginBtn = document.getElementById('loginBtn');
+            if (loginBtn) loginBtn.addEventListener('click', checkPasswordAndLogin);
+            const passwordInput = document.getElementById('passwordInput');
+            if (passwordInput) passwordInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') checkPasswordAndLogin(); });
+            const searchInput = document.getElementById('searchInput');
+            const resetBtn = document.getElementById('resetFilters');
+            if (searchInput) searchInput.addEventListener('input', () => filterAndSort());
+            if (resetBtn) resetBtn.addEventListener('click', resetAllFilters);
+            checkExistingAuth();
+        });
+    </script>
+</body>
+</html>
