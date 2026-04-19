@@ -723,10 +723,10 @@
         function renderRuleForm() {
             const container = document.getElementById('ruleTypeContent');
             if (!container) return;
-            
+    
             const types = [...new Set(originalCardsData.map(c => c.type).filter(t => t && t.trim()))];
             const products = originalCardsData.map(c => ({ name: c.name }));
-            
+    
             if (currentRuleType === 'type') {
                 const typesHtml = types.map(t => `<div class="rule-select-option" onclick="selectRuleOption('ruleTypeSelect', '${escapeHtml(t)}', '${escapeHtml(t)}')">${escapeHtml(t)}</div>`).join('');
                 container.innerHTML = `
@@ -735,7 +735,7 @@
                         <input type="hidden" id="ruleTypeSelect" value="">
                         <div class="rule-custom-select-dropdown" id="ruleTypeSelect-dropdown">${typesHtml || '<div class="rule-select-option">Нет доступных типов</div>'}</div>
                     </div>
-                    <input type="number" id="ruleTypeQty" class="rule-styled-input" placeholder="Количество от (шт)" min="1">
+                    <input type="number" id="ruleTypeQty" class="rule-styled-input" placeholder="Количество от (шт)" min="1" step="1">
                     <input type="text" id="ruleTypeMessage" class="rule-styled-input" placeholder="Что выводить? (например: Стикер в подарок)">
                 `;
             } else if (currentRuleType === 'product') {
@@ -749,19 +749,15 @@
                     `;
                 });
                 productsHtml += '</div><div id="selectedProductsDisplay"></div>';
-                
+        
                 container.innerHTML = productsHtml + `
-                    <input type="number" id="ruleProductQty" class="rule-styled-input" placeholder="Количество от (шт)" min="1">
-                    <input type="text" id="ruleProductMessage" class="rule-styled-input" placeholder="Что выводить? (например: Скидка 10% на следующий раз)">
+                    <input type="number" id="ruleProductQty" class="rule-styled-input" placeholder="Количество от (шт)" min="1" step="1">
+                    <input type="text" id="ruleProductMessage" class="rule-styled-input" placeholder="Что выводить? (например: Наклейка на лист интерактива)">
                 `;
                 updateSelectedProductsDisplay();
             } else if (currentRuleType === 'price') {
                 container.innerHTML = `
-                    <div class="price-input-wrapper">
-                        <input type="number" id="rulePriceMin" class="rule-styled-input" placeholder="Минимальная сумма (₽)" min="1" step="100" value="1000">
-                        <button class="price-step-btn" onclick="changePriceValue(-100)">−100</button>
-                        <button class="price-step-btn" onclick="changePriceValue(100)">+100</button>
-                    </div>
+                    <input type="number" id="rulePriceMin" class="rule-styled-input" placeholder="Минимальная сумма (₽)" min="1" step="100" value="1000">
                     <input type="text" id="rulePriceMessage" class="rule-styled-input" placeholder="Что выводить? (например: Печать в бланк)">
                 `;
             }
