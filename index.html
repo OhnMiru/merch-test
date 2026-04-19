@@ -231,18 +231,53 @@
         .custom-select-dropdown.show { display: block; }
         
         .filter-option-header { padding: 8px 12px; border-bottom: 1px solid var(--border-color); font-weight: 600; font-size: 12px; color: var(--text-secondary); }
-        .filter-option { padding: 8px 12px; display: flex; align-items: center; gap: 10px; cursor: pointer; transition: background 0.1s; }
-        .filter-option:hover { background: var(--badge-bg); }
-        .filter-option input { width: 16px; height: 16px; cursor: pointer; accent-color: var(--btn-bg); }
-        .filter-option label { flex: 1; cursor: pointer; font-size: 13px; color: var(--text-primary); }
         
-        .sort-option { padding: 10px 12px; cursor: pointer; transition: background 0.1s; font-size: 13px; color: var(--text-primary); }
+        /* Новый стиль для мультиселекта типов (без чекбоксов) */
+        .type-select-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 14px;
+            cursor: pointer;
+            transition: background 0.1s;
+            font-size: 13px;
+            color: var(--text-primary);
+        }
+        .type-select-item:hover {
+            background: var(--badge-bg);
+        }
+        .type-select-item.selected {
+            background: var(--badge-bg);
+        }
+        .type-select-check {
+            color: var(--btn-bg);
+            font-size: 16px;
+            font-weight: bold;
+        }
+        
+        .sort-option {
+            padding: 10px 12px;
+            cursor: pointer;
+            transition: background 0.1s;
+            font-size: 13px;
+            color: var(--text-primary);
+        }
         .sort-option:hover { background: var(--badge-bg); }
         
         .reset-btn {
-            background: var(--reset-bg); color: var(--reset-color); border: none; border-radius: 30px;
-            width: 36px; height: 36px; font-size: 18px; font-weight: bold; cursor: pointer;
-            display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+            background: var(--reset-bg);
+            color: var(--reset-color);
+            border: none;
+            border-radius: 30px;
+            width: 36px;
+            height: 36px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
         }
         .reset-btn:active { transform: scale(0.96); }
         
@@ -423,6 +458,7 @@
             font-size: 12px;
             color: var(--text-secondary);
             margin-top: 8px;
+            margin-bottom: 12px;
             padding: 0 4px;
             line-height: 1.4;
         }
@@ -486,7 +522,7 @@
         .cart-clear { flex: 1; background: var(--reset-bg); color: var(--reset-color); width: auto; padding: 12px; font-size: 14px; border-radius: 30px; border: none; cursor: pointer; }
         .empty-cart { text-align: center; padding: 40px; color: var(--text-muted); }
         
-        /* Стили для стрелочек в разделе "По сумме" (как в количестве штук) */
+        /* Стили для стрелочек в разделе "По сумме" */
         .price-control {
             display: flex;
             align-items: center;
@@ -794,7 +830,6 @@
             updateSelectedProductsDisplay();
         }
         
-        // Функция для изменения значения суммы на 100
         function changePriceValue(delta) {
             const input = document.getElementById('rulePriceMin');
             if (input) {
@@ -1272,6 +1307,101 @@
             showToast(`Продажа на ${total} ₽ завершена!`, true);
         }
         
+        // ========== ФИЛЬТР ТИПОВ (НОВЫЙ СТИЛЬ) ==========
+        function updateTypeFilterTrigger() {
+            const trigger = document.getElementById('typeFilterTrigger');
+            if (!trigger) return;
+            if (selectedTypes.size === 0) {
+                trigger.textContent = 'Все типы мерча';
+            } else if (selectedTypes.size === 1) {
+                trigger.textContent = Array.from(selectedTypes)[0];
+            } else {
+                trigger.textContent = `Выбрано: ${selectedTypes.size}`;
+            }
+        }
+        
+        function buildTypeMultiSelect() {
+            const dropdown = document.getElementById('typeFilterDropdown');
+            if (!dropdown) return;
+            
+            let html = '<div class="filter-option-header">Выберите типы мерча</div>';
+            
+            typeOptions.forEach(type => {
+                const isSelected = selectedTypes.has(type);
+                html += `
+                    <div class="type-select-item ${isSelected ? 'selected' : ''}" onclick="toggleTypeSelection('${escapeHtml(type)}')">
+                        <span>${escapeHtml(type)}</span>
+                        ${isSelected ? '<span class="type-select-check">✓</span>' : ''}
+                    </div>
+                `;
+            });
+            
+            // Кнопки Сбросить и Применить
+            html += `
+                <div style="display: flex; gap: 10px; padding: 12px; border-top: 1px solid var(--border-color); margin-top: 4px;">
+                    <button id="typeResetBtn" style="flex: 1; background: transparent; border: 1px solid var(--border-color); border-radius: 20px; padding: 8px 0; font-size: 12px; cursor: pointer; color: var(--text-secondary);">Сбросить</button>
+                    <button id="typeApplyBtn" style="flex: 1; background: var(--btn-bg); border: none; border-radius: 20px; padding: 8px 0; font-size: 12px; cursor: pointer; color: white;">Применить</button>
+                </div>
+            `;
+            
+            dropdown.innerHTML = html;
+            
+            // Привязываем события после создания DOM
+            const resetBtn = document.getElementById('typeResetBtn');
+            const applyBtn = document.getElementById('typeApplyBtn');
+            if (resetBtn) {
+                resetBtn.onclick = (e) => {
+                    e.stopPropagation();
+                    selectedTypes.clear();
+                    updateTypeFilterTrigger();
+                    renderTypeMultiSelectList(); // обновляем отображение без закрытия
+                    filterAndSort();
+                };
+            }
+            if (applyBtn) {
+                applyBtn.onclick = (e) {
+                    e.stopPropagation();
+                    document.getElementById('typeFilterDropdown').classList.remove('show');
+                    filterAndSort();
+                };
+            }
+        }
+        
+        // Функция для обновления списка без перестройки всей структуры
+        function renderTypeMultiSelectList() {
+            const dropdown = document.getElementById('typeFilterDropdown');
+            if (!dropdown) return;
+            
+            // Обновляем только элементы списка, сохраняя кнопки
+            const itemsContainer = document.createElement('div');
+            itemsContainer.innerHTML = '<div class="filter-option-header">Выберите типы мерча</div>';
+            
+            typeOptions.forEach(type => {
+                const isSelected = selectedTypes.has(type);
+                const div = document.createElement('div');
+                div.className = `type-select-item ${isSelected ? 'selected' : ''}`;
+                div.onclick = () => toggleTypeSelection(type);
+                div.innerHTML = `<span>${escapeHtml(type)}</span>${isSelected ? '<span class="type-select-check">✓</span>' : ''}`;
+                itemsContainer.appendChild(div);
+            });
+            
+            // Сохраняем кнопки
+            const buttonsDiv = dropdown.querySelector('div[style*="display: flex; gap: 10px; padding: 12px"]');
+            dropdown.innerHTML = '';
+            dropdown.appendChild(itemsContainer);
+            if (buttonsDiv) dropdown.appendChild(buttonsDiv);
+        }
+        
+        function toggleTypeSelection(type) {
+            if (selectedTypes.has(type)) {
+                selectedTypes.delete(type);
+            } else {
+                selectedTypes.add(type);
+            }
+            updateTypeFilterTrigger();
+            renderTypeMultiSelectList();
+        }
+        
         // ========== ОСТАЛЬНОЙ КОД ==========
         function initTheme() {
             const savedTheme = localStorage.getItem('merch_theme');
@@ -1296,95 +1426,6 @@
                 localStorage.setItem('merch_theme', 'dark');
                 if (themeToggle) themeToggle.textContent = '☀️';
             }
-        }
-        
-        function updateTypeFilterTrigger() {
-            const trigger = document.getElementById('typeFilterTrigger');
-            if (!trigger) return;
-            if (selectedTypes.size === 0) trigger.textContent = 'Все типы мерча';
-            else if (selectedTypes.size === 1) trigger.textContent = Array.from(selectedTypes)[0];
-            else trigger.textContent = `Выбрано: ${selectedTypes.size}`;
-        }
-        
-        function buildTypeMultiSelect() {
-            const dropdown = document.getElementById('typeFilterDropdown');
-            if (!dropdown) return;
-            dropdown.innerHTML = '<div class="filter-option-header">Выберите типы мерча</div>';
-            typeOptions.forEach(type => {
-                const div = document.createElement('div');
-                div.className = 'filter-option';
-                const checkbox = document.createElement('input');
-                checkbox.type = 'checkbox';
-                checkbox.id = `type_${type}`;
-                checkbox.value = type;
-                checkbox.checked = selectedTypes.has(type);
-                checkbox.onchange = (e) => {
-                    e.stopPropagation();
-                    if (checkbox.checked) selectedTypes.add(type);
-                    else selectedTypes.delete(type);
-                    updateTypeFilterTrigger();
-                };
-                const label = document.createElement('label');
-                label.htmlFor = `type_${type}`;
-                label.textContent = type;
-                div.appendChild(checkbox);
-                div.appendChild(label);
-                dropdown.appendChild(div);
-            });
-            const buttonsRow = document.createElement('div');
-            buttonsRow.style.display = 'flex';
-            buttonsRow.style.gap = '10px';
-            buttonsRow.style.padding = '8px 12px';
-            buttonsRow.style.borderTop = '1px solid var(--border-color)';
-            buttonsRow.style.marginTop = '4px';
-            const isMobile = window.innerWidth <= 500;
-            const resetBtn = document.createElement('button');
-            if (isMobile) {
-                resetBtn.textContent = '✕';
-                resetBtn.style.fontSize = '16px';
-                resetBtn.style.fontWeight = 'bold';
-            } else {
-                resetBtn.textContent = 'Сбросить';
-                resetBtn.style.fontSize = '12px';
-            }
-            resetBtn.style.flex = '1';
-            resetBtn.style.background = 'transparent';
-            resetBtn.style.border = '1px solid var(--border-color)';
-            resetBtn.style.borderRadius = '20px';
-            resetBtn.style.padding = '6px 0';
-            resetBtn.style.cursor = 'pointer';
-            resetBtn.style.color = 'var(--text-secondary)';
-            resetBtn.onclick = (e) => {
-                e.stopPropagation();
-                selectedTypes.clear();
-                document.querySelectorAll('#typeFilterDropdown input[type="checkbox"]').forEach(cb => cb.checked = false);
-                updateTypeFilterTrigger();
-                filterAndSort();
-            };
-            const applyBtn = document.createElement('button');
-            if (isMobile) {
-                applyBtn.textContent = '✓';
-                applyBtn.style.fontSize = '16px';
-                applyBtn.style.fontWeight = 'bold';
-            } else {
-                applyBtn.textContent = 'Применить';
-                applyBtn.style.fontSize = '12px';
-            }
-            applyBtn.style.flex = '1';
-            applyBtn.style.background = 'var(--btn-bg)';
-            applyBtn.style.border = 'none';
-            applyBtn.style.borderRadius = '20px';
-            applyBtn.style.padding = '6px 0';
-            applyBtn.style.cursor = 'pointer';
-            applyBtn.style.color = 'white';
-            applyBtn.onclick = (e) => {
-                e.stopPropagation();
-                filterAndSort();
-                document.getElementById('typeFilterDropdown').classList.remove('show');
-            };
-            buttonsRow.appendChild(resetBtn);
-            buttonsRow.appendChild(applyBtn);
-            dropdown.appendChild(buttonsRow);
         }
         
         function initSortSelect() {
@@ -1435,7 +1476,12 @@
             const typeTrigger = document.getElementById('typeFilterTrigger');
             const typeDropdown = document.getElementById('typeFilterDropdown');
             function closeTypeDropdown() { typeDropdown.classList.remove('show'); }
-            typeTrigger.onclick = (e) => { e.stopPropagation(); typeDropdown.classList.toggle('show'); };
+            typeTrigger.onclick = (e) => { 
+                e.stopPropagation(); 
+                typeDropdown.classList.toggle('show');
+                // При открытии обновляем список
+                buildTypeMultiSelect();
+            };
             document.addEventListener('click', () => closeTypeDropdown());
         }
         
@@ -1444,7 +1490,6 @@
             originalCardsData.forEach(card => { if (card.type && card.type.trim()) types.add(card.type); });
             typeOptions = Array.from(types).sort();
             selectedTypes.forEach(type => { if (!typeOptions.includes(type)) selectedTypes.delete(type); });
-            buildTypeMultiSelect();
             updateTypeFilterTrigger();
         }
         
@@ -1670,7 +1715,7 @@
             if (searchInput) searchInput.value = '';
             selectedTypes.clear();
             updateTypeFilterTrigger();
-            document.querySelectorAll('#typeFilterDropdown input[type="checkbox"]').forEach(cb => cb.checked = false);
+            if (typeof renderTypeMultiSelectList === 'function') renderTypeMultiSelectList();
             currentSortBy = 'none';
             const sortTrigger = document.getElementById('sortByTrigger');
             if (sortTrigger) sortTrigger.textContent = 'Без сортировки';
