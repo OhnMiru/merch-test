@@ -555,7 +555,6 @@
         }
 
         .history-filter-btn {
-            padding: 6px 16px;
             border-radius: 30px;
             border: 1px solid var(--border-color);
             background: var(--card-bg);
@@ -565,12 +564,17 @@
             transition: all 0.2s;
             white-space: nowrap;
             font-weight: 500;
+            display: inline-flex;
+            alight-items: center;
+            justify-content: center;
         }
         .history-filter-btn-small {
-            padding: 6px 14px;
+            min-width: 60ptx;
+            padding: 0px 8px;
         }
         .history-filter-btn-large {
-            padding: 6px 22px;
+            min-width: 90ptx;
+            padding: 0px 12px;
         }
         .history-filter-btn:hover {
             background: var(--badge-bg);
@@ -591,7 +595,7 @@
             color: var(--text-primary);
             outline: none;
             cursor: pointer;
-            width: 160px;
+            width: 170px;
         }
         .history-date-input::-webkit-calendar-picker-indicator {
             filter: var(--calendar-icon-filter, none);
