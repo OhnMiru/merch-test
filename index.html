@@ -1008,7 +1008,7 @@
                 showToast("Корзина пуста", false);
                 return;
             }
-    
+            
             // Проверяем, что всего хватает
             for (const [idxStr, qty] of items) {
                 const idx = parseInt(idxStr);
@@ -1020,29 +1020,37 @@
             }
     
             const total = items.reduce((sum, [idxStr, qty]) => {
-                 const idx = parseInt(idxStr);
+                const idx = parseInt(idxStr);
                 return sum + qty * originalCardsData[idx].price;
             }, 0);
     
-            // Продаём по одному товару (каждый -1 несколько раз)
-            for (const [idxStr, qty] of items) {
-                const idx = parseInt(idxStr);
-                for (let i = 0; i < qty; i++) {
-                    await updateStock(idx, -1, true);
-                }
-            }
+            // Сохраняем копию корзины для обработки
+            const cartCopy = { ...cart };
     
-            // Очищаем корзину
+            // МГНОВЕННО закрываем окно и очищаем корзину
+            closeCartModal();
             cart = {};
             updateCartUI();
     
-            // Закрываем модальное окно корзины
-            closeCartModal();
+            // Показываем уведомление о начале продажи
+            showToast(`Продажа на ${total} ₽... 🍌`, true);
     
-            // Принудительно обновляем данные (без перезагрузки интерфейса)
-            await loadData(true, true);
-    
-            showToast(`Продажа на ${total} ₽ завершена! 🍌`, true);
+            // Всё остальное делаем в фоне (без await, чтобы не блокировать UI)
+            (async () => {
+                // Продаём по одному товару
+                for (const [idxStr, qty] of Object.entries(cartCopy)) {
+                    const idx = parseInt(idxStr);
+                    for (let i = 0; i < qty; i++) {
+                        await updateStock(idx, -1, true);
+                    }
+                }
+        
+                // Обновляем данные в фоне
+                await loadData(true, true);
+        
+                // Показываем финальное уведомление (заменим предыдущее)
+                showToast(`✅ Продажа на ${total} ₽ завершена!`, true);
+            })();
         }
         
         // ========== ОСТАЛЬНОЙ КОД ==========
