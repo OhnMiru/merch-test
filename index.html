@@ -574,7 +574,7 @@
             font-size: 13px;
             cursor: pointer;
             width: 100%;
-            margin-top: 8px;
+            margin-top: 12px;
             margin-bottom: 8px;
         }
         .history-clear-btn:hover {
@@ -588,7 +588,7 @@
             flex-direction: column;
             gap: 12px;
             margin-bottom: 16px;
-            padding: 12px 16px;
+            padding: 16px;
             background: var(--badge-bg);
             border-radius: 20px;
             position: relative;
@@ -596,7 +596,7 @@
         .history-filter-row {
             display: flex;
             flex-wrap: wrap;
-            gap: 10px;
+            gap: 12px;
             align-items: center;
         }
         .history-filter-buttons-row {
@@ -616,8 +616,8 @@
             color: var(--text-primary);
             transition: all 0.2s;
             white-space: nowrap;
-            padding: 6px 16px;
-            height: 34px;
+            padding: 6px 18px;
+            height: 36px;
             display: inline-flex;
             align-items: center;
             justify-content: center;
@@ -626,7 +626,7 @@
             padding: 6px 14px;
         }
         .history-filter-btn-large {
-            padding: 6px 22px;
+            padding: 6px 24px;
         }
         .history-filter-btn:hover {
             background: var(--badge-bg);
@@ -636,12 +636,22 @@
             color: white;
             border-color: var(--btn-bg);
         }
+        
+        /* Кнопка сброса внизу справа */
+        .history-filter-reset-row {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 8px;
+        }
         .history-filter-reset {
             background: var(--reset-bg);
             color: var(--reset-color);
             border: 1px solid var(--border-color);
-            padding: 6px 16px;
-            margin-left: auto;
+            border-radius: 30px;
+            padding: 8px 20px;
+            font-size: 13px;
+            cursor: pointer;
+            white-space: nowrap;
         }
         .history-filter-reset:hover {
             background: var(--badge-bg);
@@ -652,13 +662,13 @@
             background: var(--card-bg);
             border: 1px solid var(--border-color);
             border-radius: 30px;
-            padding: 6px 12px;
+            padding: 6px 14px;
             font-size: 13px;
             color: var(--text-primary);
             outline: none;
             cursor: pointer;
-            width: 170px;
-            height: 34px;
+            width: 180px;
+            height: 36px;
         }
         .history-date-input::-webkit-calendar-picker-indicator {
             filter: var(--calendar-icon-filter, none);
@@ -670,12 +680,12 @@
         .history-price-filter {
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 8px;
             background: var(--card-bg);
-            padding: 4px 12px;
+            padding: 4px 14px;
             border-radius: 30px;
             border: 1px solid var(--border-color);
-            height: 34px;
+            height: 36px;
         }
         .history-price-filter span {
             font-size: 13px;
@@ -685,13 +695,13 @@
             background: var(--badge-bg);
             border: none;
             border-radius: 30px;
-            padding: 4px 8px;
+            padding: 4px 10px;
             font-size: 13px;
             color: var(--text-primary);
-            width: 75px;
+            width: 80px;
             text-align: center;
             outline: none;
-            height: 26px;
+            height: 28px;
         }
         .history-price-filter input::-webkit-inner-spin-button,
         .history-price-filter input::-webkit-outer-spin-button {
@@ -897,11 +907,12 @@
             .price-step-btn { width: 38px; height: 38px; font-size: 16px; }
             .modal-content { width: calc(100% - 30px); margin: 15px auto; }
             .modal-close-btn { top: 0; right: 0; width: 32px; height: 32px; font-size: 18px; }
-            .history-date-input { width: 130px; font-size: 12px; padding: 5px 10px; }
-            .history-filter-btn { padding: 5px 12px; font-size: 12px; }
+            .history-date-input { width: 140px; font-size: 12px; padding: 5px 10px; }
+            .history-filter-btn { padding: 5px 12px; font-size: 12px; height: 32px; }
             .history-filter-btn-small { padding: 5px 10px; }
             .history-filter-btn-large { padding: 5px 16px; }
-            .history-price-filter input { width: 55px; }
+            .history-price-filter input { width: 65px; }
+            .history-price-filter { padding: 2px 10px; gap: 5px; }
         }
     </style>
 </head>
@@ -1037,7 +1048,6 @@
                         <button class="history-filter-btn history-filter-btn-large" data-type="sale" onclick="setHistoryTypeFilter('sale')">Продажи</button>
                         <button class="history-filter-btn history-filter-btn-large" data-type="return" onclick="setHistoryTypeFilter('return')">Возвраты</button>
                     </div>
-                    <button class="history-filter-btn history-filter-reset" onclick="resetHistoryFilters()">🔄 Сбросить</button>
                 </div>
                 <div class="history-filter-row">
                     <input type="datetime-local" id="historyDateTimeFrom" class="history-date-input" step="60">
@@ -1049,6 +1059,9 @@
                         <span class="history-price-separator">—</span>
                         <input type="number" id="historyMaxPrice" placeholder="∞" step="100">
                     </div>
+                </div>
+                <div class="history-filter-reset-row">
+                    <button class="history-filter-reset" onclick="resetHistoryFilters()">🔄 Сбросить фильтры</button>
                 </div>
             </div>
             <button class="history-clear-btn" onclick="clearAllHistory()">🗑 Очистить всю историю</button>
