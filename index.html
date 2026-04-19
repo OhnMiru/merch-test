@@ -1008,7 +1008,7 @@
                 showToast("Корзина пуста", false);
                 return;
             }
-            
+    
             // Проверяем, что всего хватает
             for (const [idxStr, qty] of items) {
                 const idx = parseInt(idxStr);
@@ -1024,33 +1024,64 @@
                 return sum + qty * originalCardsData[idx].price;
             }, 0);
     
-            // Сохраняем копию корзины для обработки
+            // Сохраняем копию корзины
             const cartCopy = { ...cart };
-    
+            
             // МГНОВЕННО закрываем окно и очищаем корзину
             closeCartModal();
             cart = {};
             updateCartUI();
     
-            // Показываем уведомление о начале продажи
-            showToast(`Продажа на ${total} ₽... 🍌`, true);
-    
-            // Всё остальное делаем в фоне (без await, чтобы не блокировать UI)
-            (async () => {
-                // Продаём по одному товару
-                for (const [idxStr, qty] of Object.entries(cartCopy)) {
-                    const idx = parseInt(idxStr);
-                    for (let i = 0; i < qty; i++) {
-                        await updateStock(idx, -1, true);
+            // Обновляем остатки в данных и в DOM
+            for (const [idxStr, qty] of Object.entries(cartCopy)) {
+                const idx = parseInt(idxStr);
+                const card = originalCardsData[idx];
+                const newStock = card.stock - qty;
+                card.stock = newStock;
+        
+                // Находим карточку в DOM и обновляем только её
+                const cards = document.querySelectorAll('.card');
+                let targetCard = null;
+                let targetIndex = -1;
+        
+                // Ищем карточку по индексу
+                for (let i = 0; i < cards.length; i++) {
+                    const minusBtn = cards[i].querySelector('.minus');
+                    if (minusBtn && parseInt(minusBtn.dataset.index) === idx) {
+                        targetCard = cards[i];
+                        targetIndex = i;
+                        break;
                     }
                 }
         
-                // Обновляем данные в фоне
-                await loadData(true, true);
-        
-                // Показываем финальное уведомление (заменим предыдущее)
-                showToast(`✅ Продажа на ${total} ₽ завершена!`, true);
+                if (targetCard) {
+                    // Обновляем текст остатка
+                    const stockSpan = targetCard.querySelector('.stock');
+                    if (stockSpan) stockSpan.textContent = `Остаток: ${newStock} шт`;
+            
+                    // Обновляем выручку
+                    const sold = card.total - newStock;
+                    const revenue = sold * card.price;
+                    const revenueSpan = targetCard.querySelector('.revenue');
+                    if (revenueSpan) revenueSpan.textContent = `📊 Выручка: ${revenue} ₽`;
+                }
+            }
+    
+            // Отправляем запросы на сервер в фоне (не блокируем UI)
+            (async () => {
+                for (const [idxStr, qty] of Object.entries(cartCopy)) {
+                    const idx = parseInt(idxStr);
+                    for (let i = 0; i < qty; i++) {
+                        try {
+                            await fetch(`${API_URL}?action=update&row=${idx}&delta=-1&t=${Date.now()}`);
+                        } catch(e) { console.error(e); }
+                    }
+                }
+                // Обновляем время последнего обновления
+                showUpdateTime();
             })();
+    
+            showToast(`✅ Продажа на ${total} ₽ завершена!`, true);
         }
         
         // ========== ОСТАЛЬНОЙ КОД ==========
