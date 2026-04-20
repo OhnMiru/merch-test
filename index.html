@@ -10,7 +10,7 @@
             --bg-color: #fff5e0; --card-bg: #ffffff; --text-primary: #5a3a1a;
             --text-secondary: #e67e22; --text-muted: #b87c4a; --border-color: #ffe0a3;
             --badge-bg: #fff0d0; --badge-text: #c25d1a; --stock-color: #f39c12;
-            --price-color: #e67e22; --revenue-color: #d35400; --minus-bg: #ffe6e5;
+            --price-color: #e67e22; --minus-bg: #ffe6e5;
             --minus-color: #e67e22; --plus-bg: #fff0d0; --plus-color: #e67e22;
             --add-to-cart-bg: #f39c12; --add-to-cart-color: #8B5E3C; --btn-bg: #f39c12;
             --footer-bg: white; --shadow: rgba(0,0,0,0.08); --select-border: #ffe0a3;
@@ -24,7 +24,7 @@
             --bg-color: #1e1708; --card-bg: #2a2110; --text-primary: #f5e6c4;
             --text-secondary: #f39c12; --text-muted: #b87c4a; --border-color: #4a3a1a;
             --badge-bg: #3a2a10; --badge-text: #f39c12; --stock-color: #f39c12;
-            --price-color: #e67e22; --revenue-color: #e67e22; --minus-bg: #3a2018;
+            --price-color: #e67e22; --minus-bg: #3a2018;
             --minus-color: #e67e22; --plus-bg: #3a2a10; --plus-color: #f39c12;
             --add-to-cart-bg: #e67e22; --add-to-cart-color: #D2691E; --btn-bg: #e67e22;
             --footer-bg: #1e1708; --shadow: rgba(0,0,0,0.5); --select-border: #4a3a1a;
@@ -82,10 +82,9 @@
         .type-badge { display: inline-block; padding: 2px 8px; border-radius: 16px; font-size: 11px; font-weight: 500; line-height: 1.3; white-space: nowrap; }
         .name { font-weight: bold; font-size: 22px; color: var(--text-primary); line-height: 1.2; }
         .stock { font-size: 20px; font-weight: bold; color: var(--stock-color); margin-top: 0; margin-bottom: 3px; }
-        .total, .price, .revenue { font-size: 11px; font-weight: 500; margin-top: 0; margin-bottom: 2px; line-height: 1.3; }
+        .total, .price { font-size: 11px; font-weight: 500; margin-top: 0; margin-bottom: 2px; line-height: 1.3; }
         .total { color: var(--text-muted); }
         .price { color: var(--price-color); }
-        .revenue { color: var(--revenue-color); }
         .buttons { display: flex; gap: 8px; align-items: center; }
         button { font-size: 24px; font-weight: bold; width: 54px; height: 54px; border-radius: 27px; border: none; cursor: pointer; transition: 0.1s; box-shadow: 0 1px 3px var(--shadow); }
         button:active { transform: scale(0.96); }
@@ -101,7 +100,7 @@
         .auto-refresh-badge .dot { width: 6px; height: 6px; background-color: var(--stock-color); border-radius: 50%; display: inline-block; animation: pulse 2s infinite; }
         @keyframes pulse { 0% { opacity: 0.3; transform: scale(0.8); } 50% { opacity: 1; transform: scale(1.2); } 100% { opacity: 0.3; transform: scale(0.8); } }
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--modal-overlay); z-index: 1000; overflow-y: auto; }
-        .modal-content { background: var(--modal-bg); margin: 20px auto; border-radius: 20px; padding: 20px; max-width: 650px; width: calc(100% - 40px); max-height: 85vh; overflow-y: auto; position: relative; }
+        .modal-content { background: var(--modal-bg); margin: 20px auto; border-radius: 20px; padding: 20px; max-width: 700px; width: calc(100% - 40px); max-height: 85vh; overflow-y: auto; position: relative; }
         .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; font-size: 18px; font-weight: bold; color: var(--badge-text); padding-top: 8px; }
         .modal-close-btn { position: sticky; top: 6px; float: right; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 30px; font-size: 20px; cursor: pointer; width: 36px; height: 36px; box-shadow: 0 2px 8px var(--shadow); color: var(--text-muted); display: flex; align-items: center; justify-content: center; z-index: 1100; margin-bottom: 8px; }
         .modal-content:after { content: ""; display: table; clear: both; }
@@ -470,7 +469,7 @@
     </div>
 
     <script>
-        const API_URL = "https://script.google.com/macros/s/AKfycbw97j8OPA--jRZwHveQK4hkVUEFY1EuprHxG7GP-2OOSolT1ibwGLBlU9F-2v25xqwZLA/exec";
+        const API_URL = "https://script.google.com/macros/s/AKfycbxiYlb0xJl74hvw2jqaXnQJMnrTd-CDTlDflquUud9bWgGMwikdsqxKUZuhdTS6UOG1wA/exec";
         const CORRECT_PASSWORD = "банан";
         
         let originalCardsData = [];
@@ -1164,7 +1163,7 @@
                 return;
             }
             
-            // Получаем себестоимость из originalCardsData
+            // Получаем себестоимость из originalCardsData (столбец F)
             const costMap = {};
             originalCardsData.forEach(card => {
                 costMap[card.name] = card.cost || 0;
@@ -1224,7 +1223,7 @@
                 typeStats[data.type].cost += data.cost;
             }
             
-            // Сортируем товары по рентабельности (прибыль / выручка)
+            // Сортируем товары по рентабельности
             const sortedProducts = Object.entries(productStats)
                 .map(([name, data]) => ({
                     name,
@@ -1254,7 +1253,6 @@
             const formatPercent = (value) => value.toFixed(1) + '%';
             
             let html = `
-                <!-- Основные показатели -->
                 <div class="stats-grid">
                     <div class="stats-card">
                         <div class="stats-card-value">${formatCurrency(totalRevenue)}</div>
@@ -1282,13 +1280,11 @@
                     </div>
                 </div>
                 
-                <!-- Рентабельность -->
                 <div class="stats-summary">
                     <div class="stats-summary-value ${profitMargin >= 0 ? 'profit-positive' : 'profit-negative'}">${formatPercent(profitMargin)}</div>
                     <div class="stats-summary-label">Рентабельность продаж</div>
                 </div>
                 
-                <!-- Детализация по товарам -->
                 <div class="stats-section">
                     <div class="stats-section-title">📦 Детализация по товарам (сортировка по рентабельности)</div>
                     <table class="stats-table">
@@ -1311,7 +1307,6 @@
                     </table>
                 </div>
                 
-                <!-- Детализация по типам -->
                 <div class="stats-section">
                     <div class="stats-section-title">🏷️ Детализация по типам мерча (сортировка по рентабельности)</div>
                     <table class="stats-table">
@@ -1496,13 +1491,11 @@
             if (!card) return;
             const newStock = card.stock + delta;
             if (newStock < 0) { if (!silent) showToast("Остаток не может быть меньше 0", false); return; }
-            if (newStock > card.total) { if (!silent) showToast("Остаток не может быть больше " + card.total, false); return; }
             card.stock = newStock;
             filterAndSort();
             try {
                 const response = await fetch(`${API_URL}?action=update&row=${index}&delta=${delta}&t=${Date.now()}`);
                 const result = await response.json();
-                if (result.price) card.price = result.price;
                 if (!result.success && !silent) { await loadData(true, true); showToast("Ошибка: " + (result.error || "неизвестная"), false); }
             } catch (error) { console.error(error); if (!silent) { await loadData(true, true); showToast("Ошибка соединения", false); } }
             updateCartBadges();
@@ -1569,10 +1562,6 @@
                 if (targetCard) {
                     const stockSpan = targetCard.querySelector('.stock');
                     if (stockSpan) stockSpan.textContent = `Остаток: ${newStock} шт`;
-                    const sold = card.total - newStock;
-                    const revenue = sold * card.price;
-                    const revenueSpan = targetCard.querySelector('.revenue');
-                    if (revenueSpan) revenueSpan.textContent = `📊 Выручка: ${revenue} ₽`;
                     if (newStock === 0) targetCard.classList.add('out-of-stock');
                     else targetCard.classList.remove('out-of-stock');
                 }
@@ -1785,8 +1774,6 @@
                 const total = typeof card.total === 'number' ? card.total : 0;
                 const stock = typeof card.stock === 'number' ? card.stock : 0;
                 const price = typeof card.price === 'number' ? card.price : 0;
-                const sold = total - stock;
-                const revenue = sold * price;
                 const isOutOfStock = stock === 0;
                 const typeColor = type ? getTypeColor(type) : '#c25d1a';
                 const cardDiv = document.createElement('div');
@@ -1801,7 +1788,6 @@
                         <div class="stock">Остаток: ${stock} шт</div>
                         <div class="total">📦 Всего: ${total} шт</div>
                         <div class="price">💰 Цена: ${price} ₽</div>
-                        <div class="revenue">📊 Выручка: ${revenue} ₽</div>
                     </div>
                     <div class="buttons">
                         <button class="minus" data-index="${originalIndex}" data-delta="-1">−1</button>
