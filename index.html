@@ -571,12 +571,12 @@
             color: var(--minus-color);
             border: 1px solid var(--border-color);
             border-radius: 30px;
-            padding: 10px 10px;
+            padding: 10px 16px;
             font-size: 13px;
             cursor: pointer;
             width: 100%;
-            margin-top: 6px;
-            margin-bottom: 6px;
+            margin-top: 12px;
+            margin-bottom: 8px;
         }
         .history-clear-btn:hover {
             background: var(--minus-color);
@@ -616,21 +616,20 @@
             color: var(--text-primary);
             transition: all 0.2s;
             white-space: nowrap;
-            padding-left: 12px;
+            padding: 0 18px;
             margin: 0;
-            height: 30px;
-            line-height: 30px; 
-            width: 118px;
+            height: 34px;
             display: inline-flex;
-            text-align: center;
+            align-items: center;
+            justify-content: center;
             font-family: inherit;
             box-sizing: border-box;
         }
         .history-filter-btn-small {
-            min-width: 52px;
+            padding: 0 14px;
         }
         .history-filter-btn-large {
-            min-width: 100px;
+            padding: 0 24px;
         }
         .history-filter-btn:hover {
             background: var(--badge-bg);
@@ -641,14 +640,13 @@
             border-color: var(--btn-bg);
         }
         
-        /* Нижняя строка: фильтр суммы слева, кнопка сброса справа */
+        /* Нижняя строка: фильтр суммы */
         .history-filter-bottom {
             display: flex;
             flex-wrap: wrap;
             gap: 12px;
             align-items: center;
-            justify-content: space-between;
-            margin-top: 12px;
+            margin-top: 4px;
         }
         .history-filter-left {
             display: flex;
@@ -657,19 +655,26 @@
             align-items: center;
             flex: 1;
         }
+        
+        /* Отдельная строка для кнопки сброса */
+        .history-filter-reset-row {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 8px;
+        }
         .history-filter-reset {
             background: var(--reset-bg);
             color: var(--reset-color);
             border: 1px solid var(--border-color);
             border-radius: 30px;
-            padding: 10 28px;
+            padding: 0 28px;
             height: 34px;
-            width: 90px;
             font-size: 13px;
             cursor: pointer;
             white-space: nowrap;
             display: inline-flex;
-            margin-top: 12px;
+            align-items: center;
+            justify-content: center;
         }
         .history-filter-reset:hover {
             background: var(--badge-bg);
@@ -1080,7 +1085,9 @@
                             <input type="number" id="historyMaxPrice" placeholder="∞" step="100">
                         </div>
                     </div>
-                    <button class="history-filter-reset" onclick="resetHistoryFilters()">Сбросить</button>
+                </div>
+                <div class="history-filter-reset-row">
+                    <button class="history-filter-reset" onclick="resetHistoryFilters()">🔄 Сбросить фильтры</button>
                 </div>
             </div>
             <button class="history-clear-btn" onclick="clearAllHistory()">🗑 Очистить всю историю</button>
