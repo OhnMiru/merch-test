@@ -18,6 +18,7 @@
             --progress-bar: #f39c12; --modal-bg: white; --modal-overlay: rgba(0,0,0,0.7);
             --toast-bg: #2ecc71; --toast-text: white; --out-of-stock-bg: #e8e8e8;
             --cart-disabled-bg: #f0f0f0; --cart-disabled-text: #999; --calendar-icon-filter: none;
+            --profit-positive: #2ecc71; --profit-negative: #e74c3c;
         }
         body.dark {
             --bg-color: #1e1708; --card-bg: #2a2110; --text-primary: #f5e6c4;
@@ -31,6 +32,7 @@
             --progress-bar: #f39c12; --modal-bg: #2a2110; --modal-overlay: rgba(0,0,0,0.95);
             --toast-bg: #27ae60; --toast-text: #ffffff; --out-of-stock-bg: #2a2a2a;
             --cart-disabled-bg: #3a3a3a; --cart-disabled-text: #888; --calendar-icon-filter: invert(1) hue-rotate(180deg);
+            --profit-positive: #27ae60; --profit-negative: #e74c3c;
         }
         body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg-color); margin: 0; padding: 12px; padding-bottom: 70px; transition: background 0.3s ease; }
         .header-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px; }
@@ -99,7 +101,7 @@
         .auto-refresh-badge .dot { width: 6px; height: 6px; background-color: var(--stock-color); border-radius: 50%; display: inline-block; animation: pulse 2s infinite; }
         @keyframes pulse { 0% { opacity: 0.3; transform: scale(0.8); } 50% { opacity: 1; transform: scale(1.2); } 100% { opacity: 0.3; transform: scale(0.8); } }
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--modal-overlay); z-index: 1000; overflow-y: auto; }
-        .modal-content { background: var(--modal-bg); margin: 20px auto; border-radius: 20px; padding: 20px; max-width: 550px; width: calc(100% - 40px); max-height: 85vh; overflow-y: auto; position: relative; }
+        .modal-content { background: var(--modal-bg); margin: 20px auto; border-radius: 20px; padding: 20px; max-width: 650px; width: calc(100% - 40px); max-height: 85vh; overflow-y: auto; position: relative; }
         .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; font-size: 18px; font-weight: bold; color: var(--badge-text); padding-top: 8px; }
         .modal-close-btn { position: sticky; top: 6px; float: right; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 30px; font-size: 20px; cursor: pointer; width: 36px; height: 36px; box-shadow: 0 2px 8px var(--shadow); color: var(--text-muted); display: flex; align-items: center; justify-content: center; z-index: 1100; margin-bottom: 8px; }
         .modal-content:after { content: ""; display: table; clear: both; }
@@ -191,6 +193,88 @@
         .price-control input { flex: 1; padding: 12px 14px; border-radius: 30px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-primary); font-size: 14px; margin-bottom: 0; }
         .price-step-btn { width: 44px; height: 44px; border-radius: 22px; background: var(--badge-bg); border: 1px solid var(--border-color); font-size: 18px; font-weight: bold; cursor: pointer; color: var(--text-primary); display: flex; align-items: center; justify-content: center; }
         .price-step-btn:active { transform: scale(0.95); }
+        
+        /* Стили для статистики */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+        .stats-card {
+            background: var(--badge-bg);
+            border-radius: 16px;
+            padding: 12px;
+            text-align: center;
+        }
+        .stats-card-value {
+            font-size: 22px;
+            font-weight: bold;
+            color: var(--stock-color);
+            margin-bottom: 6px;
+        }
+        .stats-card-label {
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+        .stats-section {
+            margin-top: 20px;
+            margin-bottom: 16px;
+        }
+        .stats-section-title {
+            font-size: 15px;
+            font-weight: bold;
+            color: var(--badge-text);
+            margin-bottom: 12px;
+            padding-bottom: 6px;
+            border-bottom: 2px solid var(--border-color);
+        }
+        .stats-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+        }
+        .stats-table th,
+        .stats-table td {
+            padding: 8px 6px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .stats-table th {
+            font-weight: 600;
+            color: var(--text-secondary);
+            background: var(--badge-bg);
+        }
+        .stats-table td {
+            color: var(--text-primary);
+        }
+        .stats-table .text-right {
+            text-align: right;
+        }
+        .profit-positive {
+            color: var(--profit-positive);
+        }
+        .profit-negative {
+            color: var(--profit-negative);
+        }
+        .stats-summary {
+            background: var(--btn-bg);
+            border-radius: 16px;
+            padding: 16px;
+            margin-top: 20px;
+            text-align: center;
+        }
+        .stats-summary-value {
+            font-size: 28px;
+            font-weight: bold;
+            color: white;
+        }
+        .stats-summary-label {
+            font-size: 11px;
+            color: rgba(255,255,255,0.8);
+            margin-top: 4px;
+        }
+        
         @media (min-width: 1024px) { .title-row { margin-bottom: 2px; } .name { font-size: 24px; } .stock { font-size: 22px; } .card { padding: 12px; } }
         @media (min-width: 768px) and (max-width: 1024px) { body { padding-bottom: 85px; } .footer { padding: 12px 20px; font-size: 13px; } .footer a { padding: 6px 8px; } }   
         @media (max-width: 500px) {
@@ -216,6 +300,9 @@
             .datetime-select { padding: 2px 3px; font-size: 9px; }
             .history-filter-left { flex-direction: column; align-items: flex-start; width: 100%; }
             .history-price-filter { width: 100%; justify-content: center; }
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+            .stats-card-value { font-size: 18px; }
+            .stats-table th, .stats-table td { font-size: 10px; padding: 6px 3px; }
         }
     </style>
 </head>
@@ -241,10 +328,11 @@
         </div>
         <div class="sub">Всё на благо ясгу фд! Всё на благо ясгу фд!</div>
         
-        <div style="display: flex; gap: 10px; margin-bottom: 12px;">
+        <div style="display: flex; gap: 10px; margin-bottom: 12px; flex-wrap: wrap;">
             <button class="refresh-btn" onclick="loadData(true, true)">🔄 Обновить</button>
             <button class="refresh-btn" id="rulesButton">📋 Правила</button>
             <button class="history-btn" onclick="showHistory()">📜 История</button>
+            <button class="refresh-btn" id="statsButton">📊 Статистика</button>
         </div>
         
         <div id="progressContainer" class="progress-container"><div id="progressBar" class="progress-bar"></div></div>
@@ -367,9 +455,22 @@
             <div id="history-list"><div class="loading">Загрузка истории...</div></div>
         </div>
     </div>
+    
+    <!-- Модалка статистики -->
+    <div id="statsModal" class="modal">
+        <div class="modal-content" style="max-width: 700px;">
+            <button class="modal-close-btn" onclick="closeStatsModal()">×</button>
+            <div class="modal-header">
+                <span>📊 Статистика продаж</span>
+            </div>
+            <div id="stats-content">
+                <div class="loading">Загрузка статистики...</div>
+            </div>
+        </div>
+    </div>
 
     <script>
-        const API_URL = "https://script.google.com/macros/s/AKfycbyD2_gkqLxwWhSWyL9QN0FJaTgZg2CIWGiTeDeL6EbDEem4HHabGmVtAiC-QlL_rcQ_zA/exec";
+        const API_URL = "https://script.google.com/macros/s/AKfycbw97j8OPA--jRZwHveQK4hkVUEFY1EuprHxG7GP-2OOSolT1ibwGLBlU9F-2v25xqwZLA/exec";
         const CORRECT_PASSWORD = "банан";
         
         let originalCardsData = [];
@@ -393,7 +494,7 @@
             return typeColors.get(type);
         }
         
-        // ========== ИСТОРИЯ С ПОЛНОЙ СИНХРОНИЗАЦИЕЙ ==========
+        // ========== ИСТОРИЯ ==========
         let salesHistory = [];
         let historyMethodFilter = "all";
         let historyTypeFilter = "all";
@@ -414,13 +515,10 @@
         async function syncFullHistoryToServer() {
             try {
                 const data = encodeURIComponent(JSON.stringify(salesHistory));
-                const response = await fetch(`${API_URL}?action=syncFullHistory&data=${data}&t=${Date.now()}`);
-                const result = await response.json();
-                console.log('История полностью синхронизирована с сервером:', result);
-                return result.success;
+                await fetch(`${API_URL}?action=syncFullHistory&data=${data}&t=${Date.now()}`);
+                console.log('История синхронизирована с сервером');
             } catch (error) {
                 console.error('Ошибка синхронизации истории:', error);
-                return false;
             }
         }
 
@@ -434,7 +532,6 @@
                     if (document.getElementById('historyModal')?.style.display === 'block') {
                         renderHistoryList();
                     }
-                    console.log('История загружена с сервера, записей:', salesHistory.length);
                     return true;
                 }
                 return false;
@@ -523,7 +620,7 @@
             }
         }
 
-        // ========== ПРАВИЛА С ПОЛНОЙ СИНХРОНИЗАЦИЕЙ ==========
+        // ========== ПРАВИЛА ==========
         let rulesList = [];
         let currentRuleType = "type";
         let selectedProducts = new Set();
@@ -532,13 +629,10 @@
         async function syncFullRulesToServer() {
             try {
                 const data = encodeURIComponent(JSON.stringify(rulesList));
-                const response = await fetch(`${API_URL}?action=syncFullRules&data=${data}&t=${Date.now()}`);
-                const result = await response.json();
-                console.log('Правила полностью синхронизированы с сервером:', result);
-                return result.success;
+                await fetch(`${API_URL}?action=syncFullRules&data=${data}&t=${Date.now()}`);
+                console.log('Правила синхронизированы с сервером');
             } catch (error) {
                 console.error('Ошибка синхронизации правил:', error);
-                return false;
             }
         }
 
@@ -550,7 +644,6 @@
                     rulesList = data.rules;
                     localStorage.setItem('merch_rules_structured', JSON.stringify(rulesList));
                     renderRulesList();
-                    console.log('Правила загружены с сервера, правил:', rulesList.length);
                     return true;
                 }
                 return false;
@@ -1045,6 +1138,205 @@
             return activeRules;
         }
         
+        // ========== СТАТИСТИКА ==========
+        function openStatsModal() {
+            const modal = document.getElementById('statsModal');
+            if (modal) {
+                renderStats();
+                modal.style.display = 'block';
+            }
+        }
+
+        function closeStatsModal() {
+            const modal = document.getElementById('statsModal');
+            if (modal) modal.style.display = 'none';
+        }
+
+        function renderStats() {
+            const container = document.getElementById('stats-content');
+            if (!container) return;
+            
+            // Только продажи (не возвраты)
+            const sales = salesHistory.filter(entry => !entry.isReturn);
+            
+            if (sales.length === 0) {
+                container.innerHTML = '<div class="empty-cart">📊 Нет данных для статистики</div>';
+                return;
+            }
+            
+            // Получаем себестоимость из originalCardsData
+            const costMap = {};
+            originalCardsData.forEach(card => {
+                costMap[card.name] = card.cost || 0;
+            });
+            
+            // Собираем данные по товарам
+            const productStats = {};
+            let totalRevenue = 0;
+            let totalCost = 0;
+            let totalItems = 0;
+            let orderCount = sales.length;
+            
+            for (const sale of sales) {
+                let saleRevenue = 0;
+                let saleCost = 0;
+                let saleItems = 0;
+                
+                for (const item of sale.items) {
+                    const itemRevenue = item.qty * item.price;
+                    const itemCost = (costMap[item.name] || 0) * item.qty;
+                    
+                    saleRevenue += itemRevenue;
+                    saleCost += itemCost;
+                    saleItems += item.qty;
+                    
+                    if (!productStats[item.name]) {
+                        const card = originalCardsData.find(c => c.name === item.name);
+                        productStats[item.name] = {
+                            type: card?.type || "Другое",
+                            qty: 0,
+                            revenue: 0,
+                            cost: 0
+                        };
+                    }
+                    productStats[item.name].qty += item.qty;
+                    productStats[item.name].revenue += itemRevenue;
+                    productStats[item.name].cost += itemCost;
+                }
+                
+                totalRevenue += saleRevenue;
+                totalCost += saleCost;
+                totalItems += saleItems;
+            }
+            
+            const totalProfit = totalRevenue - totalCost;
+            const averageCheck = orderCount > 0 ? totalRevenue / orderCount : 0;
+            const profitMargin = totalRevenue > 0 ? (totalProfit / totalRevenue * 100) : 0;
+            
+            // Собираем данные по типам
+            const typeStats = {};
+            for (const [name, data] of Object.entries(productStats)) {
+                if (!typeStats[data.type]) {
+                    typeStats[data.type] = { qty: 0, revenue: 0, cost: 0 };
+                }
+                typeStats[data.type].qty += data.qty;
+                typeStats[data.type].revenue += data.revenue;
+                typeStats[data.type].cost += data.cost;
+            }
+            
+            // Сортируем товары по рентабельности (прибыль / выручка)
+            const sortedProducts = Object.entries(productStats)
+                .map(([name, data]) => ({
+                    name,
+                    type: data.type,
+                    qty: data.qty,
+                    revenue: data.revenue,
+                    cost: data.cost,
+                    profit: data.revenue - data.cost,
+                    margin: data.revenue > 0 ? ((data.revenue - data.cost) / data.revenue * 100) : 0
+                }))
+                .sort((a, b) => b.margin - a.margin);
+            
+            // Сортируем типы по рентабельности
+            const sortedTypes = Object.entries(typeStats)
+                .map(([type, data]) => ({
+                    type,
+                    qty: data.qty,
+                    revenue: data.revenue,
+                    cost: data.cost,
+                    profit: data.revenue - data.cost,
+                    margin: data.revenue > 0 ? ((data.revenue - data.cost) / data.revenue * 100) : 0
+                }))
+                .sort((a, b) => b.margin - a.margin);
+            
+            const formatCurrency = (value) => value.toLocaleString('ru-RU') + ' ₽';
+            const formatNumber = (value) => value.toLocaleString('ru-RU');
+            const formatPercent = (value) => value.toFixed(1) + '%';
+            
+            let html = `
+                <!-- Основные показатели -->
+                <div class="stats-grid">
+                    <div class="stats-card">
+                        <div class="stats-card-value">${formatCurrency(totalRevenue)}</div>
+                        <div class="stats-card-label">💰 Общая выручка</div>
+                    </div>
+                    <div class="stats-card">
+                        <div class="stats-card-value">${formatCurrency(totalCost)}</div>
+                        <div class="stats-card-label">📦 Себестоимость</div>
+                    </div>
+                    <div class="stats-card">
+                        <div class="stats-card-value ${totalProfit >= 0 ? 'profit-positive' : 'profit-negative'}">${formatCurrency(totalProfit)}</div>
+                        <div class="stats-card-label">📈 Чистая прибыль</div>
+                    </div>
+                    <div class="stats-card">
+                        <div class="stats-card-value">${formatNumber(totalItems)}</div>
+                        <div class="stats-card-label">📊 Продано единиц</div>
+                    </div>
+                    <div class="stats-card">
+                        <div class="stats-card-value">${formatNumber(orderCount)}</div>
+                        <div class="stats-card-label">🛒 Количество заказов</div>
+                    </div>
+                    <div class="stats-card">
+                        <div class="stats-card-value">${formatCurrency(averageCheck)}</div>
+                        <div class="stats-card-label">💳 Средний чек</div>
+                    </div>
+                </div>
+                
+                <!-- Рентабельность -->
+                <div class="stats-summary">
+                    <div class="stats-summary-value ${profitMargin >= 0 ? 'profit-positive' : 'profit-negative'}">${formatPercent(profitMargin)}</div>
+                    <div class="stats-summary-label">Рентабельность продаж</div>
+                </div>
+                
+                <!-- Детализация по товарам -->
+                <div class="stats-section">
+                    <div class="stats-section-title">📦 Детализация по товарам (сортировка по рентабельности)</div>
+                    <table class="stats-table">
+                        <thead>
+                            <tr><th>Товар</th><th>Тип</th><th class="text-right">Кол-во</th><th class="text-right">Выручка</th><th class="text-right">Себест.</th><th class="text-right">Прибыль</th><th class="text-right">Рентаб.</th></tr>
+                        </thead>
+                        <tbody>
+                            ${sortedProducts.map(p => `
+                                <tr>
+                                    <td>${escapeHtml(p.name)}</td>
+                                    <td><span class="type-badge" style="background:${getTypeColor(p.type)}20; color:${getTypeColor(p.type)};">${escapeHtml(p.type)}</span></td>
+                                    <td class="text-right">${p.qty} шт</td>
+                                    <td class="text-right">${formatCurrency(p.revenue)}</td>
+                                    <td class="text-right">${formatCurrency(p.cost)}</td>
+                                    <td class="text-right ${p.profit >= 0 ? 'profit-positive' : 'profit-negative'}">${formatCurrency(p.profit)}</td>
+                                    <td class="text-right ${p.margin >= 0 ? 'profit-positive' : 'profit-negative'}">${formatPercent(p.margin)}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- Детализация по типам -->
+                <div class="stats-section">
+                    <div class="stats-section-title">🏷️ Детализация по типам мерча (сортировка по рентабельности)</div>
+                    <table class="stats-table">
+                        <thead>
+                            <tr><th>Тип</th><th class="text-right">Кол-во</th><th class="text-right">Выручка</th><th class="text-right">Себест.</th><th class="text-right">Прибыль</th><th class="text-right">Рентаб.</th></tr>
+                        </thead>
+                        <tbody>
+                            ${sortedTypes.map(t => `
+                                <tr>
+                                    <td><span class="type-badge" style="background:${getTypeColor(t.type)}20; color:${getTypeColor(t.type)};">${escapeHtml(t.type)}</span></td>
+                                    <td class="text-right">${t.qty} шт</td>
+                                    <td class="text-right">${formatCurrency(t.revenue)}</td>
+                                    <td class="text-right">${formatCurrency(t.cost)}</td>
+                                    <td class="text-right ${t.profit >= 0 ? 'profit-positive' : 'profit-negative'}">${formatCurrency(t.profit)}</td>
+                                    <td class="text-right ${t.margin >= 0 ? 'profit-positive' : 'profit-negative'}">${formatPercent(t.margin)}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+            
+            container.innerHTML = html;
+        }
+        
         // ========== КОРЗИНА ==========
         let cart = {};
         
@@ -1210,6 +1502,7 @@
             try {
                 const response = await fetch(`${API_URL}?action=update&row=${index}&delta=${delta}&t=${Date.now()}`);
                 const result = await response.json();
+                if (result.price) card.price = result.price;
                 if (!result.success && !silent) { await loadData(true, true); showToast("Ошибка: " + (result.error || "неизвестная"), false); }
             } catch (error) { console.error(error); if (!silent) { await loadData(true, true); showToast("Ошибка соединения", false); } }
             updateCartBadges();
@@ -1645,6 +1938,7 @@
             if (event.target === document.getElementById('historyModal')) closeHistory();
             if (event.target === document.getElementById('cartModal')) closeCartModal();
             if (event.target === document.getElementById('rulesModal')) closeRulesModal();
+            if (event.target === document.getElementById('statsModal')) closeStatsModal();
         }
         
         function bindDateTimeEvents() {
@@ -1728,6 +2022,8 @@
             if (resetBtn) resetBtn.addEventListener('click', resetAllFilters);
             const rulesBtn = document.getElementById('rulesButton');
             if (rulesBtn) rulesBtn.addEventListener('click', openRulesModal);
+            const statsBtn = document.getElementById('statsButton');
+            if (statsBtn) statsBtn.addEventListener('click', openStatsModal);
             checkExistingAuth();
         });
     </script>
