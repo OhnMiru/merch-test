@@ -681,6 +681,48 @@
             background: var(--badge-bg);
         }
 
+        /* Кастомные поля даты и времени */
+        .custom-datetime {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 30px;
+            padding: 4px 12px;
+            height: 34px;
+        }
+        .custom-datetime .datetime-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+        .datetime-group {
+            display: flex;
+            align-items: center;
+            gap: 2px;
+        }
+        .datetime-select {
+            background: var(--badge-bg);
+            border: none;
+            border-radius: 20px;
+            padding: 4px 6px;
+            font-size: 12px;
+            color: var(--text-primary);
+            outline: none;
+            cursor: pointer;
+            text-align: center;
+            font-family: monospace;
+        }
+        .datetime-select option {
+            background: var(--card-bg);
+            color: var(--text-primary);
+        }
+        .datetime-sep {
+            color: var(--text-muted);
+            font-size: 12px;
+        }
+
         /* Поля даты */
         .history-date-input {
             background: var(--card-bg);
@@ -938,6 +980,8 @@
             .history-price-filter input { width: 65px; }
             .history-price-filter { padding: 2px 10px; gap: 5px; height: 32px; }
             .history-filter-reset { padding: 0 20px; height: 32px; font-size: 12px; }
+            .custom-datetime { padding: 2px 8px; height: 32px; gap: 4px; }
+            .datetime-select { padding: 2px 3px; font-size: 10px; }
         }
     </style>
 </head>
@@ -1076,9 +1120,38 @@
                 </div>
                 <div class="history-filter-bottom">
                     <div class="history-filter-left">
-                        <input type="datetime-local" id="historyDateTimeFrom" class="history-date-input" step="60">
+                        <!-- Кастомные поля даты и времени -->
+                        <div class="custom-datetime" id="datetimeFromContainer">
+                            <span class="datetime-label">с</span>
+                            <div class="datetime-group">
+                                <select id="dateFromDay" class="datetime-select"></select>
+                                <span class="datetime-sep">.</span>
+                                <select id="dateFromMonth" class="datetime-select"></select>
+                                <span class="datetime-sep">.</span>
+                                <select id="dateFromYear" class="datetime-select"></select>
+                            </div>
+                            <div class="datetime-group">
+                                <select id="timeFromHour" class="datetime-select"></select>
+                                <span class="datetime-sep">:</span>
+                                <select id="timeFromMinute" class="datetime-select"></select>
+                            </div>
+                        </div>
                         <span class="history-price-separator">—</span>
-                        <input type="datetime-local" id="historyDateTimeTo" class="history-date-input" step="60">
+                        <div class="custom-datetime" id="datetimeToContainer">
+                            <span class="datetime-label">по</span>
+                            <div class="datetime-group">
+                                <select id="dateToDay" class="datetime-select"></select>
+                                <span class="datetime-sep">.</span>
+                                <select id="dateToMonth" class="datetime-select"></select>
+                                <span class="datetime-sep">.</span>
+                                <select id="dateToYear" class="datetime-select"></select>
+                            </div>
+                            <div class="datetime-group">
+                                <select id="timeToHour" class="datetime-select"></select>
+                                <span class="datetime-sep">:</span>
+                                <select id="timeToMinute" class="datetime-select"></select>
+                            </div>
+                        </div>
                         <div class="history-price-filter">
                             <span>💰</span>
                             <input type="number" id="historyMinPrice" placeholder="0" value="0" step="100">
@@ -1187,6 +1260,100 @@
             renderHistoryList();
         }
 
+        // Инициализация кастомных полей даты и времени
+        function initDateTimeSelects() {
+            // Заполняем дни (1-31)
+            const daySelects = ['dateFromDay', 'dateToDay'];
+            for (const selectId of daySelects) {
+                const select = document.getElementById(selectId);
+                if (select) {
+                    select.innerHTML = '';
+                    for (let i = 1; i <= 31; i++) {
+                        const option = document.createElement('option');
+                        option.value = i;
+                        option.textContent = i.toString().padStart(2, '0');
+                        select.appendChild(option);
+                    }
+                }
+            }
+            
+            // Заполняем месяцы (1-12)
+            const monthSelects = ['dateFromMonth', 'dateToMonth'];
+            for (const selectId of monthSelects) {
+                const select = document.getElementById(selectId);
+                if (select) {
+                    select.innerHTML = '';
+                    for (let i = 1; i <= 12; i++) {
+                        const option = document.createElement('option');
+                        option.value = i;
+                        option.textContent = i.toString().padStart(2, '0');
+                        select.appendChild(option);
+                    }
+                }
+            }
+            
+            // Заполняем годы (2020-2030)
+            const yearSelects = ['dateFromYear', 'dateToYear'];
+            const currentYear = new Date().getFullYear();
+            for (const selectId of yearSelects) {
+                const select = document.getElementById(selectId);
+                if (select) {
+                    select.innerHTML = '';
+                    for (let i = currentYear - 2; i <= currentYear + 2; i++) {
+                        const option = document.createElement('option');
+                        option.value = i;
+                        option.textContent = i;
+                        if (i === currentYear) option.selected = true;
+                        select.appendChild(option);
+                    }
+                }
+            }
+            
+            // Заполняем часы (0-23)
+            const hourSelects = ['timeFromHour', 'timeToHour'];
+            for (const selectId of hourSelects) {
+                const select = document.getElementById(selectId);
+                if (select) {
+                    select.innerHTML = '';
+                    for (let i = 0; i <= 23; i++) {
+                        const option = document.createElement('option');
+                        option.value = i;
+                        option.textContent = i.toString().padStart(2, '0');
+                        select.appendChild(option);
+                    }
+                }
+            }
+            
+            // Заполняем минуты (0-59)
+            const minuteSelects = ['timeFromMinute', 'timeToMinute'];
+            for (const selectId of minuteSelects) {
+                const select = document.getElementById(selectId);
+                if (select) {
+                    select.innerHTML = '';
+                    for (let i = 0; i <= 59; i++) {
+                        const option = document.createElement('option');
+                        option.value = i;
+                        option.textContent = i.toString().padStart(2, '0');
+                        select.appendChild(option);
+                    }
+                }
+            }
+        }
+
+        // Функция получения даты из кастомных селектов
+        function getDateTimeFromSelects(prefix) {
+            const day = document.getElementById(`${prefix}Day`)?.value;
+            const month = document.getElementById(`${prefix}Month`)?.value;
+            const year = document.getElementById(`${prefix}Year`)?.value;
+            const hour = document.getElementById(`time${prefix === 'dateFrom' ? 'From' : 'To'}Hour`)?.value;
+            const minute = document.getElementById(`time${prefix === 'dateFrom' ? 'From' : 'To'}Minute`)?.value;
+            
+            if (day && month && year && hour && minute) {
+                return new Date(year, month - 1, day, hour, minute);
+            }
+            return null;
+        }
+
         function resetHistoryFilters() {
             historyMethodFilter = "all";
             historyTypeFilter = "all";
@@ -1196,12 +1363,38 @@
             document.querySelector('[data-method="all"]')?.classList.add('active');
             document.querySelector('[data-type="all"]')?.classList.add('active');
             
-            const dateFrom = document.getElementById('historyDateTimeFrom');
-            const dateTo = document.getElementById('historyDateTimeTo');
+            // Сбрасываем даты в селектах на текущие значения по умолчанию
+            const now = new Date();
+            const currentYear = now.getFullYear();
+            const currentMonth = now.getMonth() + 1;
+            const currentDay = now.getDate();
+            
+            // Сброс селектов "с"
+            const fromDay = document.getElementById('dateFromDay');
+            const fromMonth = document.getElementById('dateFromMonth');
+            const fromYear = document.getElementById('dateFromYear');
+            const fromHour = document.getElementById('timeFromHour');
+            const fromMinute = document.getElementById('timeFromMinute');
+            if (fromDay) fromDay.value = currentDay;
+            if (fromMonth) fromMonth.value = currentMonth;
+            if (fromYear) fromYear.value = currentYear;
+            if (fromHour) fromHour.value = 0;
+            if (fromMinute) fromMinute.value = 0;
+            
+            // Сброс селектов "по"
+            const toDay = document.getElementById('dateToDay');
+            const toMonth = document.getElementById('dateToMonth');
+            const toYear = document.getElementById('dateToYear');
+            const toHour = document.getElementById('timeToHour');
+            const toMinute = document.getElementById('timeToMinute');
+            if (toDay) toDay.value = currentDay;
+            if (toMonth) toMonth.value = currentMonth;
+            if (toYear) toYear.value = currentYear;
+            if (toHour) toHour.value = 23;
+            if (toMinute) toMinute.value = 59;
+            
             const minPrice = document.getElementById('historyMinPrice');
             const maxPrice = document.getElementById('historyMaxPrice');
-            if (dateFrom) dateFrom.value = '';
-            if (dateTo) dateTo.value = '';
             if (minPrice) minPrice.value = '0';
             if (maxPrice) maxPrice.value = '';
             
@@ -1232,8 +1425,9 @@
             const container = document.getElementById('history-list');
             if (!container) return;
     
-            const dateTimeFrom = document.getElementById('historyDateTimeFrom')?.value;
-            const dateTimeTo = document.getElementById('historyDateTimeTo')?.value;
+            // Получаем даты из кастомных селектов
+            const fromDate = getDateTimeFromSelects('dateFrom');
+            const toDate = getDateTimeFromSelects('dateTo');
             const minPrice = parseInt(document.getElementById('historyMinPrice')?.value) || 0;
             const maxPrice = parseInt(document.getElementById('historyMaxPrice')?.value) || Infinity;
     
@@ -1251,12 +1445,10 @@
                 filtered = filtered.filter(e => e.isReturn === true);
             }
     
-            if (dateTimeFrom) {
-                const fromDate = new Date(dateTimeFrom);
+            if (fromDate) {
                 filtered = filtered.filter(e => new Date(e.date) >= fromDate);
             }
-            if (dateTimeTo) {
-                const toDate = new Date(dateTimeTo);
+            if (toDate) {
                 filtered = filtered.filter(e => new Date(e.date) <= toDate);
             }
     
@@ -2291,10 +2483,18 @@
             if (event.target === document.getElementById('rulesModal')) closeRulesModal();
         }
         
-        document.getElementById('historyDateTimeFrom')?.addEventListener('change', () => renderHistoryList());
-        document.getElementById('historyDateTimeTo')?.addEventListener('change', () => renderHistoryList());
-        document.getElementById('historyMinPrice')?.addEventListener('input', () => renderHistoryList());
-        document.getElementById('historyMaxPrice')?.addEventListener('input', () => renderHistoryList());
+        // Добавляем слушатели для обновления истории при изменении дат
+        function bindDateTimeEvents() {
+            const selectIds = ['dateFromDay', 'dateFromMonth', 'dateFromYear', 'timeFromHour', 'timeFromMinute', 'dateToDay', 'dateToMonth', 'dateToYear', 'timeToHour', 'timeToMinute'];
+            for (const id of selectIds) {
+                const el = document.getElementById(id);
+                if (el) el.addEventListener('change', () => renderHistoryList());
+            }
+            const minPrice = document.getElementById('historyMinPrice');
+            const maxPrice = document.getElementById('historyMaxPrice');
+            if (minPrice) minPrice.addEventListener('input', () => renderHistoryList());
+            if (maxPrice) maxPrice.addEventListener('input', () => renderHistoryList());
+        }
         
         function startAutoRefresh() { if (autoRefreshInterval) clearInterval(autoRefreshInterval); autoRefreshInterval = setInterval(() => { loadData(false, true); }, 60000); }
         
@@ -2324,6 +2524,8 @@
                 initCustomSelects();
                 loadRules();
                 loadHistory();
+                initDateTimeSelects();
+                bindDateTimeEvents();
                 loadData(true, true);
                 startAutoRefresh();
             } else { errorMsg.style.display = 'block'; passwordInput.value = ''; passwordInput.focus(); }
@@ -2338,6 +2540,8 @@
                 initCustomSelects();
                 loadRules();
                 loadHistory();
+                initDateTimeSelects();
+                bindDateTimeEvents();
                 loadData(true, true);
                 startAutoRefresh();
             } else { loginOverlay.style.display = 'flex'; mainContent.style.display = 'none'; document.getElementById('passwordInput').focus(); }
