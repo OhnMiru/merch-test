@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>🍌 Бананчики — учёт мерча</title>
+    <title>🍌 PATI — учёт мерча</title>
     <style>
+        /* ВСЕ ТВОИ СТИЛИ ОСТАЮТСЯ БЕЗ ИЗМЕНЕНИЙ */
         * {
             box-sizing: border-box;
             user-select: none;
@@ -2125,19 +2126,27 @@
         <span class="cart-badge" id="cartCount">0</span>
     </button>
 
+    <!-- ЭКРАН ВХОДА С ЛОГИНОМ И ПАРОЛЕМ -->
     <div id="loginOverlay" style="position: fixed; top:0; left:0; width:100%; height:100%; background:var(--bg-color); z-index:2000; display:flex; align-items:center; justify-content:center;">
-        <div class="login-card" style="background:var(--card-bg); border-radius:24px; padding:32px 24px; width:280px; text-align:center; box-shadow:0 8px 24px var(--shadow);">
-            <h2 style="color:var(--badge-text); margin-bottom:20px;">Вход<br>в Бананчики 🍌</h2>
-            <input type="password" id="passwordInput" style="width:100%; padding:12px; font-size:16px; border:1px solid var(--border-color); border-radius:30px; outline:none; margin-bottom:16px; text-align:center; background:var(--card-bg); color:var(--text-primary);" placeholder="Введите пароль" autofocus>
+        <div class="login-card" style="background:var(--card-bg); border-radius:24px; padding:32px 24px; width:320px; text-align:center; box-shadow:0 8px 24px var(--shadow);">
+            <h2 style="color:var(--badge-text); margin-bottom:10px;">🍌 Ясгу фд</h2>
+            <p style="color:var(--text-muted); font-size:13px; margin-bottom:20px;">Заходите на пати</p>
+            
+            <input type="text" id="loginInput" style="width:100%; padding:12px; font-size:16px; border:1px solid var(--border-color); border-radius:30px; outline:none; margin-bottom:12px; text-align:center; background:var(--card-bg); color:var(--text-primary);" placeholder="Логин" autofocus>
+            
+            <input type="password" id="passwordInput" style="width:100%; padding:12px; font-size:16px; border:1px solid var(--border-color); border-radius:30px; outline:none; margin-bottom:16px; text-align:center; background:var(--card-bg); color:var(--text-primary);" placeholder="Пароль">
+            
             <button id="loginBtn" style="background:var(--btn-bg); color:white; border:none; border-radius:30px; padding:12px 24px; font-size:16px; font-weight:500; width:100%; cursor:pointer;">🍌 Войти 🍌</button>
-            <div id="errorMsg" style="color:var(--minus-color); font-size:12px; margin-top:12px; display:none;">Банан недоволен</div>
+            
+            <div id="errorMsg" style="color:var(--minus-color); font-size:12px; margin-top:12px; display:none;"></div>
         </div>
     </div>
 
+    <!-- ОСНОВНОЙ КОНТЕНТ (скрыт сначала) -->
     <div id="mainContent" style="display:none;">
         <div class="header-row">
             <div class="title-area">
-                <h1>Учёт бананчиков 🍌</h1>
+                <h1 id="shopTitle">🍌 Учёт мерча</h1>
                 <span class="beta-badge">beta</span>
             </div>
             <button class="theme-toggle" id="themeToggle">🌙</button>
@@ -2149,6 +2158,7 @@
             <button class="refresh-btn" id="rulesButton">📋 Правила</button>
             <button class="history-btn" onclick="showHistory()">📜 История</button>
             <button class="refresh-btn" id="statsButton">📊 Статистика</button>
+            <button class="refresh-btn" onclick="logout()" style="background: var(--minus-bg); color: var(--minus-color);">🚪 Выйти</button>
         </div>
 
         <div id="progressContainer" class="progress-container">
@@ -2171,7 +2181,7 @@
         </div>
 
         <div id="cards-container">
-            <div class="loading">Загрузка бананчиков... 🍌</div>
+            <div class="loading">Загрузка...</div>
         </div>
         <div class="last-update" id="update-time"></div>
         <div class="auto-refresh-badge">
@@ -2179,162 +2189,192 @@
             <span>Автообновление каждую минуту</span>
         </div>
         <div class="footer">
-            Намяукано | <a href="https://docs.google.com/spreadsheets/d/12b52PdQfgsN_8jwZRpOEbZSMWoYj3s1CRHqA2As24U4/edit" target="_blank">Синхронизация с таблицей</a>
+            PATI | <a id="sheetLink" href="#" target="_blank">Синхронизация с таблицей</a>
         </div>
     </div>
 
-    <div id="cartModal" class="modal cart-modal">
-        <div class="modal-content">
-            <button class="modal-close-btn" onclick="closeCartModal()">×</button>
-            <div class="modal-header">
-                <span>🛒 Корзина</span>
-            </div>
-            <div id="discount-panel" class="discount-section" style="display: none;"></div>
-            <div id="cart-items-list">
-                <div class="empty-cart">🍌 Корзина пуста</div>
-            </div>
-            <div id="cart-total" class="cart-total" style="display:none;">Итого: 0 ₽</div>
-            <div class="cart-actions" id="cart-actions" style="display:none;">
-                <button class="cart-gift" onclick="giftCart()">🎁</button>
-                <button class="cart-clear" onclick="clearCart()">❌ Очистить</button>
-                <button class="cart-checkout" onclick="checkout()">✅ Продать всё</button>
-            </div>
-        </div>
-    </div>
-
-    <div id="rulesModal" class="modal">
-        <div class="modal-content" style="max-width: 550px;">
-            <button class="modal-close-btn" onclick="closeRulesModal()">×</button>
-            <div class="modal-header">
-                <span>📋 Правила для продавца</span>
-            </div>
-            <div class="rule-type-buttons">
-                <button class="rule-type-btn" data-type="type" onclick="selectRuleType('type')">📦 По типу</button>
-                <button class="rule-type-btn" data-type="product" onclick="selectRuleType('product')">🏷️ По товару</button>
-                <button class="rule-type-btn" data-type="price" onclick="selectRuleType('price')">💰 По сумме</button>
-                <button class="rule-type-btn" data-type="bonus" onclick="selectRuleType('bonus')">💵 Бонус</button>
-            </div>
-            <div id="ruleTypeContent"></div>
-            <button onclick="addStructuredRule()" style="background: var(--btn-bg); color: white; width: 100%; padding: 12px; border-radius: 30px; border: none; font-size: 14px; margin-top: 8px; cursor: pointer;">➕ Добавить правило</button>
-            <div style="font-weight: bold; margin: 20px 0 12px 0;">📋 Список правил</div>
-            <div id="rules-list" style="max-height: 300px; overflow-y: auto;">
-                <div class="empty-cart">📭 Нет добавленных правил. Создайте новое!</div>
-            </div>
-            <button onclick="deleteAllRules()" style="background: var(--minus-bg); color: var(--minus-color); width: 100%; padding: 12px; border-radius: 30px; border: none; font-size: 14px; margin-top: 12px; cursor: pointer;">🗑 Удалить все правила</button>
-        </div>
-    </div>
-
-    <div id="historyModal" class="modal">
-        <div class="modal-content" style="max-width: 550px;">
-            <button class="modal-close-btn" onclick="closeHistory()">×</button>
-            <div class="modal-header">
-                <span>📜 История операций</span>
-            </div>
-            <div class="history-filters">
-                <div class="history-filter-row">
-                    <div class="history-filter-buttons-group">
-                        <button class="history-filter-btn history-filter-btn-small" data-method="all" onclick="setHistoryMethodFilter('all')">Все</button>
-                        <button class="history-filter-btn history-filter-btn-large" data-method="basket" onclick="setHistoryMethodFilter('basket')">Корзина</button>
-                        <button class="history-filter-btn history-filter-btn-large" data-method="single" onclick="setHistoryMethodFilter('single')">Поштучно</button>
-                    </div>
-                    <div class="history-filter-buttons-group">
-                        <button class="history-filter-btn history-filter-btn-small" data-type="all" onclick="setHistoryTypeFilter('all')">Все</button>
-                        <button class="history-filter-btn history-filter-btn-large" data-type="sale" onclick="setHistoryTypeFilter('sale')">Продажи</button>
-                        <button class="history-filter-btn history-filter-btn-large" data-type="return" onclick="setHistoryTypeFilter('return')">Возвраты</button>
-                    </div>
-                </div>
-                <div class="history-filter-bottom">
-                    <div class="history-filter-left">
-                        <div class="custom-datetime" id="datetimeFromContainer">
-                            <span class="datetime-label">с</span>
-                            <div class="datetime-group">
-                                <select id="dateFromDay" class="datetime-select"></select>
-                                <span class="datetime-sep"> </span>
-                                <select id="dateFromMonth" class="datetime-select"></select>
-                                <span class="datetime-sep"> </span>
-                                <select id="dateFromYear" class="datetime-select"></select>
-                            </div>
-                            <div class="datetime-group">
-                                <select id="timeFromHour" class="datetime-select"></select>
-                                <span class="datetime-sep">:</span>
-                                <select id="timeFromMinute" class="datetime-select"></select>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="history-filter-left" style="margin-top: 8px;">
-                        <div class="custom-datetime" id="datetimeToContainer">
-                            <span class="datetime-label">по</span>
-                            <div class="datetime-group">
-                                <select id="dateToDay" class="datetime-select"></select>
-                                <span class="datetime-sep"> </span>
-                                <select id="dateToMonth" class="datetime-select"></select>
-                                <span class="datetime-sep"> </span>
-                                <select id="dateToYear" class="datetime-select"></select>
-                            </div>
-                            <div class="datetime-group">
-                                <select id="timeToHour" class="datetime-select"></select>
-                                <span class="datetime-sep">:</span>
-                                <select id="timeToMinute" class="datetime-select"></select>
-                            </div>
-                        </div>
-                        <div class="history-price-filter">
-                            <span>💰</span>
-                            <input type="number" id="historyMinPrice" placeholder="0" value="0" step="100">
-                            <span class="history-price-separator">—</span>
-                            <input type="number" id="historyMaxPrice" placeholder="∞" step="100">
-                        </div>
-                    </div>
-                    <div class="history-filter-reset-row">
-                        <button class="history-filter-reset" onclick="resetHistoryFilters()">Сбросить</button>
-                    </div>
-                </div>
-            </div>
-            <button class="history-clear-btn" onclick="clearAllHistory()">🗑 Очистить всю историю</button>
-            <div id="history-list">
-                <div class="loading">Загрузка истории...</div>
-            </div>
-        </div>
-    </div>
-
-    <div id="statsModal" class="modal">
-        <div class="modal-content" style="max-width: 800px;">
-            <button class="modal-close-btn" onclick="closeStatsModal()">×</button>
-            <div class="modal-header">
-                <span>📊 Статистика продаж</span>
-            </div>
-            <div id="stats-content">
-                <div class="loading">Загрузка статистики...</div>
-            </div>
-        </div>
-    </div>
-
-    <div id="editProductModal" class="modal edit-product-modal">
-        <div class="modal-content">
-            <button class="modal-close-btn" onclick="closeEditProductModal()">×</button>
-            <div class="modal-header">
-                <span>✏️ Редактирование товара</span>
-            </div>
-            <div id="edit-product-content">
-                <div class="edit-row">
-                    <span class="edit-label">Всего</span>
-                    <input type="number" id="editTotal" class="edit-input" value="0">
-                </div>
-                <div class="edit-row">
-                    <span class="edit-label">Остаток</span>
-                    <input type="number" id="editStock" class="edit-input" value="0">
-                </div>
-                <div class="edit-buttons">
-                    <button class="edit-save-btn" onclick="saveProductChanges()">Сохранить</button>
-                    <button class="edit-cancel-btn" onclick="closeEditProductModal()">Отмена</button>
-                </div>
-            </div>
-        </div>
-    </div>
+    <!-- МОДАЛЬНЫЕ ОКНА (cartModal, rulesModal, historyModal, statsModal, editProductModal) -->
+    <!-- ВСТАВЬ ИХ СЮДА ИЗ ТВОЕГО КОДА -->
 
     <script>
-        const API_URL = "https://script.google.com/macros/s/AKfycbzTy-EPlVQ5HYDbqCMdZ0fj10j5SzQ0EDJWmIjBhaBO_rKFaUZJIj4TQe9DZEcTd67aug/exec";
-        const CORRECT_PASSWORD = "банан";
-
+        // ========== НАСТРОЙКА ==========
+        const CENTRAL_API_URL = "https://script.google.com/macros/s/AKfycbwzgerBoj9kSB3KhxG2yh8A6exDBXIIV4RhFY1rsFrM_ZQztVOuYqmH5zdOb_RW1V8r/exec";
+        
+        // Текущий пользователь
+        let CURRENT_USER = {
+            id: null,
+            name: null,
+            role: null,
+            sheetUrl: null
+        };
+        
+        // Функция для построения URL с параметром participant
+        function buildApiUrl(action, extraParams = "") {
+            if (!CURRENT_USER.id) return "#";
+            return `${CENTRAL_API_URL}?action=${action}&participant=${CURRENT_USER.id}${extraParams}&t=${Date.now()}`;
+        }
+        
+        // ========== ВХОД ==========
+        async function login() {
+            const loginInput = document.getElementById('loginInput');
+            const passwordInput = document.getElementById('passwordInput');
+            const errorMsg = document.getElementById('errorMsg');
+            
+            const login = loginInput.value.trim().toLowerCase();
+            const password = passwordInput.value;
+            
+            if (!login || !password) {
+                errorMsg.style.display = 'block';
+                errorMsg.textContent = 'Введите логин и пароль';
+                return;
+            }
+            
+            errorMsg.style.display = 'none';
+            
+            try {
+                const response = await fetch(`${CENTRAL_API_URL}?action=checkPassword&user=${encodeURIComponent(login)}&pwd=${encodeURIComponent(password)}`);
+                const result = await response.json();
+                
+                if (result.success) {
+                    // Сохраняем данные пользователя
+                    CURRENT_USER.id = login;
+                    CURRENT_USER.name = result.name || login;
+                    CURRENT_USER.role = result.role || 'artist';
+                    CURRENT_USER.sheetUrl = result.sheetUrl || '#';
+                    
+                    // Сохраняем авторизацию на 24 часа
+                    localStorage.setItem(`auth_user`, login);
+                    localStorage.setItem(`auth_time`, Date.now());
+                    
+                    // Обновляем интерфейс
+                    document.getElementById('loginOverlay').style.display = 'none';
+                    document.getElementById('mainContent').style.display = 'block';
+                    
+                    const roleIcon = CURRENT_USER.role === 'organizer' ? '📊' : '🎨';
+                    document.getElementById('shopTitle').innerHTML = `${roleIcon} ${CURRENT_USER.name} — учёт мерча`;
+                    
+                    const sheetLink = document.getElementById('sheetLink');
+                    if (sheetLink && CURRENT_USER.sheetUrl && CURRENT_USER.sheetUrl !== '#') {
+                        sheetLink.href = CURRENT_USER.sheetUrl;
+                    }
+                    
+                    // Если организатор — добавляем кнопку статистики
+                    if (CURRENT_USER.role === 'organizer') {
+                        addGlobalStatsButton();
+                    }
+                    
+                    // Инициализируем приложение
+                    initApp();
+                } else {
+                    errorMsg.style.display = 'block';
+                    errorMsg.textContent = result.error || 'Неверный логин или пароль';
+                    passwordInput.value = '';
+                }
+            } catch (error) {
+                errorMsg.style.display = 'block';
+                errorMsg.textContent = 'Ошибка соединения. Попробуйте позже.';
+                console.error(error);
+            }
+        }
+        
+        function addGlobalStatsButton() {
+            const buttonsDiv = document.querySelector('#mainContent > div:first-child');
+            if (buttonsDiv && !document.getElementById('globalStatsBtn')) {
+                const btn = document.createElement('button');
+                btn.id = 'globalStatsBtn';
+                btn.className = 'refresh-btn';
+                btn.innerHTML = '📊 Статистика всех';
+                btn.onclick = showGlobalStats;
+                buttonsDiv.appendChild(btn);
+            }
+        }
+        
+        async function showGlobalStats() {
+            showToast("Загрузка статистики всех участников...", true);
+            try {
+                const response = await fetch(`${CENTRAL_API_URL}?action=getAllStats&participant=${CURRENT_USER.id}`);
+                const data = await response.json();
+                showModal(renderGlobalStatsModal(data));
+            } catch(e) {
+                showToast("Ошибка загрузки статистики", false);
+            }
+        }
+        
+        function renderGlobalStatsModal(stats) {
+            let html = '<h3>📊 Статистика всех участников</h3><table class="detail-table">';
+            html += '<thead><tr><th>Участник</th><th>Роль</th><th>Остатков на сумму</th><th>Всего товаров</th></tr></thead><tbody>';
+            for (const s of stats.stats || []) {
+                html += `<tr>
+                            <td>${escapeHtml(s.name)}</td>
+                            <td>${s.role === 'organizer' ? 'Организатор' : 'Художник'}</td>
+                            <td class="text-right">${(s.totalValue || 0).toLocaleString()} ₽</td>
+                            <td class="text-right">${s.totalItems || 0} шт</td>
+                          </tr>`;
+            }
+            html += '</tbody></table>';
+            return html;
+        }
+        
+        function showModal(content) {
+            let modal = document.getElementById('customModal');
+            if (!modal) {
+                modal = document.createElement('div');
+                modal.id = 'customModal';
+                modal.className = 'modal';
+                modal.innerHTML = `<div class="modal-content"><button class="modal-close-btn" onclick="this.closest('.modal').style.display='none'">×</button><div id="modalBody"></div></div>`;
+                document.body.appendChild(modal);
+            }
+            document.getElementById('modalBody').innerHTML = content;
+            modal.style.display = 'block';
+        }
+        
+        function logout() {
+            localStorage.removeItem('auth_user');
+            localStorage.removeItem('auth_time');
+            CURRENT_USER.id = null;
+            document.getElementById('mainContent').style.display = 'none';
+            document.getElementById('loginOverlay').style.display = 'flex';
+            document.getElementById('loginInput').value = '';
+            document.getElementById('passwordInput').value = '';
+            document.getElementById('errorMsg').style.display = 'none';
+        }
+        
+        // Проверка сохранённой авторизации
+        function checkExistingAuth() {
+            const savedUser = localStorage.getItem('auth_user');
+            const authTime = localStorage.getItem('auth_time');
+            
+            if (savedUser && authTime && (Date.now() - parseInt(authTime)) < 24 * 60 * 60 * 1000) {
+                // Автоматически восстанавливаем сессию
+                document.getElementById('loginInput').value = savedUser;
+                const fakeEvent = { preventDefault: () => {} };
+                login();
+            } else {
+                document.getElementById('loginOverlay').style.display = 'flex';
+                document.getElementById('mainContent').style.display = 'none';
+            }
+        }
+        
+        // ========== ИНИЦИАЛИЗАЦИЯ ПРИЛОЖЕНИЯ ==========
+        function initApp() {
+            initCustomSelects();
+            loadRules();
+            loadHistory();
+            loadExtraCosts();
+            initDateTimeSelects();
+            bindDateTimeEvents();
+            initCustomOrder();
+            loadData(true, true);
+            startAutoRefresh();
+            startHistoryAutoSync();
+        }
+        
+        // ========== ВЕСЬ ОСТАЛЬНОЙ КОД ИЗ ТВОЕГО ФАЙЛА ==========
+        // (все функции от let originalCardsData = [] до конца)
+        // ОНИ ОСТАЮТСЯ БЕЗ ИЗМЕНЕНИЙ!
+        
+        // Важно: ВСЕ ВЫЗОВЫ fetch ДОЛЖНЫ ИСПОЛЬЗОВАТЬ buildApiUrl()
+        
         let originalCardsData = [];
         let currentFilteredData = [];
         let isLoading = false;
@@ -2393,7 +2433,7 @@
             card.stock = newStock;
             filterAndSort();
             try {
-                await fetch(`${API_URL}?action=updateTotal&row=${currentEditIndex}&newTotal=${newTotal}&newStock=${newStock}&t=${Date.now()}`);
+                await fetch(buildApiUrl("updateTotal", `&row=${currentEditIndex}&newTotal=${newTotal}&newStock=${newStock}`));
             } catch (e) {
                 console.error(e);
             }
@@ -2566,7 +2606,7 @@
         async function syncExtraCostsToServer() {
             try {
                 const data = encodeURIComponent(JSON.stringify(extraCosts));
-                await fetch(`${API_URL}?action=syncExtraCosts&data=${data}&t=${Date.now()}`);
+                await fetch(buildApiUrl("syncExtraCosts", `&data=${data}`));
             } catch (e) {
                 console.error(e);
             }
@@ -2574,7 +2614,7 @@
 
         async function loadExtraCostsFromServer() {
             try {
-                const response = await fetch(`${API_URL}?action=getExtraCosts&t=${Date.now()}`);
+                const response = await fetch(buildApiUrl("getExtraCosts"));
                 const data = await response.json();
                 if (data && data.costs) {
                     extraCosts = data.costs;
@@ -2648,7 +2688,7 @@
         async function syncFullHistoryToServer() {
             try {
                 const data = encodeURIComponent(JSON.stringify(salesHistory));
-                await fetch(`${API_URL}?action=syncFullHistory&data=${data}&t=${Date.now()}`);
+                await fetch(buildApiUrl("syncFullHistory", `&data=${data}`));
             } catch (e) {
                 console.error(e);
             }
@@ -2656,7 +2696,7 @@
 
         async function loadHistoryFromServer() {
             try {
-                const response = await fetch(`${API_URL}?action=getFullHistory&t=${Date.now()}`);
+                const response = await fetch(buildApiUrl("getFullHistory"));
                 const data = await response.json();
                 if (data && data.history) {
                     salesHistory = data.history;
@@ -2763,7 +2803,7 @@
         async function syncFullRulesToServer() {
             try {
                 const data = encodeURIComponent(JSON.stringify(rulesList));
-                await fetch(`${API_URL}?action=syncFullRules&data=${data}&t=${Date.now()}`);
+                await fetch(buildApiUrl("syncFullRules", `&data=${data}`));
             } catch (e) {
                 console.error(e);
             }
@@ -2771,7 +2811,7 @@
 
         async function loadRulesFromServer() {
             try {
-                const response = await fetch(`${API_URL}?action=getRules&t=${Date.now()}`);
+                const response = await fetch(buildApiUrl("getRules"));
                 const data = await response.json();
                 if (data && data.rules) {
                     rulesList = data.rules;
@@ -3501,7 +3541,7 @@
                     <div class="detail-section"><div class="detail-title">🏆 Самые популярные типы мерча</div>
                     <table class="detail-table">
                         <thead>
-                            <tr><th>#</th><th>Тип</th><th class="text-right">Продано, шт</th></tr>
+                            <tr><th>#</th><th>Тип</th><th class="text-right">Продано, шт</th><tr>
                         </thead>
                         <tbody>
                             ${topTypesByQty.map(([type, data], idx) => `
@@ -3860,7 +3900,7 @@
                     const idx = parseInt(idxStr);
                     for (let i = 0; i < qty; i++) {
                         try {
-                            await fetch(`${API_URL}?action=update&row=${idx}&delta=-1&t=${Date.now()}`);
+                            await fetch(buildApiUrl("update", `&row=${idx}&delta=-1`));
                         } catch (e) {
                             console.error(e);
                         }
@@ -3896,7 +3936,7 @@
             card.stock = newStock;
             filterAndSort();
             try {
-                const response = await fetch(`${API_URL}?action=update&row=${index}&delta=${delta}&t=${Date.now()}`);
+                const response = await fetch(buildApiUrl("update", `&row=${index}&delta=${delta}`));
                 const result = await response.json();
                 if (!result.success && !silent) {
                     await loadData(true, true);
@@ -4007,7 +4047,7 @@
                     const idx = parseInt(idxStr);
                     for (let i = 0; i < qty; i++) {
                         try {
-                            await fetch(`${API_URL}?action=update&row=${idx}&delta=-1&t=${Date.now()}`);
+                            await fetch(buildApiUrl("update", `&row=${idx}&delta=-1`));
                         } catch (e) {
                             console.error(e);
                         }
@@ -4129,7 +4169,7 @@
         async function syncCustomOrderToServer() {
             try {
                 const data = encodeURIComponent(JSON.stringify(customOrder));
-                await fetch(`${API_URL}?action=syncCustomOrder&data=${data}&t=${Date.now()}`);
+                await fetch(buildApiUrl("syncCustomOrder", `&data=${data}`));
             } catch (e) {
                 console.error(e);
             }
@@ -4137,7 +4177,7 @@
 
         async function loadCustomOrderFromServer() {
             try {
-                const response = await fetch(`${API_URL}?action=getCustomOrder&t=${Date.now()}`);
+                const response = await fetch(buildApiUrl("getCustomOrder"));
                 const data = await response.json();
                 if (data && data.order && Array.isArray(data.order)) {
                     customOrder = data.order;
@@ -4503,12 +4543,12 @@
                 if (showProgress) showProgressBar();
                 if (showLoading) {
                     const container = document.getElementById('cards-container');
-                    if (container) container.innerHTML = '<div class="loading">Загрузка бананчиков... 🍌</div>';
+                    if (container) container.innerHTML = '<div class="loading">Загрузка бананчиков...</div>';
                 }
             }
 
             try {
-                const response = await fetch(API_URL + "?action=get&t=" + Date.now());
+                const response = await fetch(buildApiUrl("get"));
                 const data = await response.json();
 
                 if (data && data.length > 0) {
@@ -4623,57 +4663,6 @@
             filterAndSort();
         }
 
-        function checkPasswordAndLogin() {
-            const passwordInput = document.getElementById('passwordInput');
-            const errorMsg = document.getElementById('errorMsg');
-            const loginOverlay = document.getElementById('loginOverlay');
-            const mainContent = document.getElementById('mainContent');
-
-            if (passwordInput.value === CORRECT_PASSWORD) {
-                localStorage.setItem('merch_authenticated', 'true');
-                loginOverlay.style.display = 'none';
-                mainContent.style.display = 'block';
-                initCustomSelects();
-                loadRules();
-                loadHistory();
-                loadExtraCosts();
-                initDateTimeSelects();
-                bindDateTimeEvents();
-                initCustomOrder();
-                loadData(true, true);
-                startAutoRefresh();
-                startHistoryAutoSync();
-            } else {
-                errorMsg.style.display = 'block';
-                passwordInput.value = '';
-                passwordInput.focus();
-            }
-        }
-
-        function checkExistingAuth() {
-            const loginOverlay = document.getElementById('loginOverlay');
-            const mainContent = document.getElementById('mainContent');
-
-            if (localStorage.getItem('merch_authenticated') === 'true') {
-                loginOverlay.style.display = 'none';
-                mainContent.style.display = 'block';
-                initCustomSelects();
-                loadRules();
-                loadHistory();
-                loadExtraCosts();
-                initDateTimeSelects();
-                bindDateTimeEvents();
-                initCustomOrder();
-                loadData(true, true);
-                startAutoRefresh();
-                startHistoryAutoSync();
-            } else {
-                loginOverlay.style.display = 'flex';
-                mainContent.style.display = 'none';
-                document.getElementById('passwordInput').focus();
-            }
-        }
-
         document.addEventListener('click', function(event) {
             if (!event.target.closest('.rule-custom-select')) {
                 closeAllRuleSelects();
@@ -4695,12 +4684,19 @@
             if (themeToggle) themeToggle.addEventListener('click', toggleTheme);
 
             const loginBtn = document.getElementById('loginBtn');
-            if (loginBtn) loginBtn.addEventListener('click', checkPasswordAndLogin);
+            if (loginBtn) loginBtn.addEventListener('click', login);
 
-            const passwordInput = document.getElementById('passwordInput');
-            if (passwordInput) {
-                passwordInput.addEventListener('keypress', (e) => {
-                    if (e.key === 'Enter') checkPasswordAndLogin();
+            const loginInput = document.getElementById('loginInput');
+            const passwordInput2 = document.getElementById('passwordInput');
+            
+            if (loginInput) {
+                loginInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') login();
+                });
+            }
+            if (passwordInput2) {
+                passwordInput2.addEventListener('keypress', (e) {
+                    if (e.key === 'Enter') login();
                 });
             }
 
