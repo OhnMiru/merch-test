@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>🍌 Банановый учёт мерча</title>
     <style>
-        /* ВСЕ ТВОИ СТИЛИ ОСТАЮТСЯ БЕЗ ИЗМЕНЕНИЙ */
         * {
             box-sizing: border-box;
             user-select: none;
@@ -2193,9 +2192,158 @@
         </div>
     </div>
 
-    <!-- МОДАЛЬНЫЕ ОКНА (cartModal, rulesModal, historyModal, statsModal, editProductModal) -->
-    <!-- ВСТАВЬ ИХ СЮДА ИЗ ТВОЕГО КОДА -->
+    <!-- Cart Modal -->
+    <div id="cartModal" class="modal cart-modal">
+        <div class="modal-content">
+            <button class="modal-close-btn" onclick="closeCartModal()">×</button>
+            <div class="modal-header">
+                <span>🛒 Корзина</span>
+            </div>
+            <div id="discount-panel" class="discount-section" style="display: none;"></div>
+            <div id="cart-items-list">
+                <div class="empty-cart">🍌 Корзина пуста</div>
+            </div>
+            <div id="cart-total" class="cart-total" style="display:none;">Итого: 0 ₽</div>
+            <div class="cart-actions" id="cart-actions" style="display:none;">
+                <button class="cart-gift" onclick="giftCart()">🎁</button>
+                <button class="cart-clear" onclick="clearCart()">❌ Очистить</button>
+                <button class="cart-checkout" onclick="checkout()">✅ Продать всё</button>
+            </div>
+        </div>
+    </div>
 
+    <!-- Rules Modal -->
+    <div id="rulesModal" class="modal">
+        <div class="modal-content" style="max-width: 550px;">
+            <button class="modal-close-btn" onclick="closeRulesModal()">×</button>
+            <div class="modal-header">
+                <span>📋 Правила для продавца</span>
+            </div>
+            <div class="rule-type-buttons">
+                <button class="rule-type-btn" data-type="type" onclick="selectRuleType('type')">📦 По типу</button>
+                <button class="rule-type-btn" data-type="product" onclick="selectRuleType('product')">🏷️ По товару</button>
+                <button class="rule-type-btn" data-type="price" onclick="selectRuleType('price')">💰 По сумме</button>
+                <button class="rule-type-btn" data-type="bonus" onclick="selectRuleType('bonus')">💵 Бонус</button>
+            </div>
+            <div id="ruleTypeContent"></div>
+            <button onclick="addStructuredRule()" style="background: var(--btn-bg); color: white; width: 100%; padding: 12px; border-radius: 30px; border: none; font-size: 14px; margin-top: 8px; cursor: pointer;">➕ Добавить правило</button>
+            <div style="font-weight: bold; margin: 20px 0 12px 0;">📋 Список правил</div>
+            <div id="rules-list" style="max-height: 300px; overflow-y: auto;">
+                <div class="empty-cart">📭 Нет добавленных правил. Создайте новое!</div>
+            </div>
+            <button onclick="deleteAllRules()" style="background: var(--minus-bg); color: var(--minus-color); width: 100%; padding: 12px; border-radius: 30px; border: none; font-size: 14px; margin-top: 12px; cursor: pointer;">🗑 Удалить все правила</button>
+        </div>
+    </div>
+
+    <!-- History Modal -->
+    <div id="historyModal" class="modal">
+        <div class="modal-content" style="max-width: 550px;">
+            <button class="modal-close-btn" onclick="closeHistory()">×</button>
+            <div class="modal-header">
+                <span>📜 История операций</span>
+            </div>
+            <div class="history-filters">
+                <div class="history-filter-row">
+                    <div class="history-filter-buttons-group">
+                        <button class="history-filter-btn history-filter-btn-small" data-method="all" onclick="setHistoryMethodFilter('all')">Все</button>
+                        <button class="history-filter-btn history-filter-btn-large" data-method="basket" onclick="setHistoryMethodFilter('basket')">Корзина</button>
+                        <button class="history-filter-btn history-filter-btn-large" data-method="single" onclick="setHistoryMethodFilter('single')">Поштучно</button>
+                    </div>
+                    <div class="history-filter-buttons-group">
+                        <button class="history-filter-btn history-filter-btn-small" data-type="all" onclick="setHistoryTypeFilter('all')">Все</button>
+                        <button class="history-filter-btn history-filter-btn-large" data-type="sale" onclick="setHistoryTypeFilter('sale')">Продажи</button>
+                        <button class="history-filter-btn history-filter-btn-large" data-type="return" onclick="setHistoryTypeFilter('return')">Возвраты</button>
+                    </div>
+                </div>
+                <div class="history-filter-bottom">
+                    <div class="history-filter-left">
+                        <div class="custom-datetime" id="datetimeFromContainer">
+                            <span class="datetime-label">с</span>
+                            <div class="datetime-group">
+                                <select id="dateFromDay" class="datetime-select"></select>
+                                <span class="datetime-sep"> </span>
+                                <select id="dateFromMonth" class="datetime-select"></select>
+                                <span class="datetime-sep"> </span>
+                                <select id="dateFromYear" class="datetime-select"></select>
+                            </div>
+                            <div class="datetime-group">
+                                <select id="timeFromHour" class="datetime-select"></select>
+                                <span class="datetime-sep">:</span>
+                                <select id="timeFromMinute" class="datetime-select"></select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="history-filter-left" style="margin-top: 8px;">
+                        <div class="custom-datetime" id="datetimeToContainer">
+                            <span class="datetime-label">по</span>
+                            <div class="datetime-group">
+                                <select id="dateToDay" class="datetime-select"></select>
+                                <span class="datetime-sep"> </span>
+                                <select id="dateToMonth" class="datetime-select"></select>
+                                <span class="datetime-sep"> </span>
+                                <select id="dateToYear" class="datetime-select"></select>
+                            </div>
+                            <div class="datetime-group">
+                                <select id="timeToHour" class="datetime-select"></select>
+                                <span class="datetime-sep">:</span>
+                                <select id="timeToMinute" class="datetime-select"></select>
+                            </div>
+                        </div>
+                        <div class="history-price-filter">
+                            <span>💰</span>
+                            <input type="number" id="historyMinPrice" placeholder="0" value="0" step="100">
+                            <span class="history-price-separator">—</span>
+                            <input type="number" id="historyMaxPrice" placeholder="∞" step="100">
+                        </div>
+                    </div>
+                    <div class="history-filter-reset-row">
+                        <button class="history-filter-reset" onclick="resetHistoryFilters()">Сбросить</button>
+                    </div>
+                </div>
+            </div>
+            <button class="history-clear-btn" onclick="clearAllHistory()">🗑 Очистить всю историю</button>
+            <div id="history-list">
+                <div class="loading">Загрузка истории...</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stats Modal -->
+    <div id="statsModal" class="modal">
+        <div class="modal-content" style="max-width: 800px;">
+            <button class="modal-close-btn" onclick="closeStatsModal()">×</button>
+            <div class="modal-header">
+                <span>📊 Статистика продаж</span>
+            </div>
+            <div id="stats-content">
+                <div class="loading">Загрузка статистики...</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Product Modal -->
+    <div id="editProductModal" class="modal edit-product-modal">
+        <div class="modal-content">
+            <button class="modal-close-btn" onclick="closeEditProductModal()">×</button>
+            <div class="modal-header">
+                <span>✏️ Редактирование товара</span>
+            </div>
+            <div id="edit-product-content">
+                <div class="edit-row">
+                    <span class="edit-label">Всего</span>
+                    <input type="number" id="editTotal" class="edit-input" value="0">
+                </div>
+                <div class="edit-row">
+                    <span class="edit-label">Остаток</span>
+                    <input type="number" id="editStock" class="edit-input" value="0">
+                </div>
+                <div class="edit-buttons">
+                    <button class="edit-save-btn" onclick="saveProductChanges()">Сохранить</button>
+                    <button class="edit-cancel-btn" onclick="closeEditProductModal()">Отмена</button>
+                </div>
+            </div>
+        </div>
+    </div>
     <script>
         // ========== НАСТРОЙКА ==========
         const CENTRAL_API_URL = "https://script.google.com/macros/s/AKfycbwzgerBoj9kSB3KhxG2yh8A6exDBXIIV4RhFY1rsFrM_ZQztVOuYqmH5zdOb_RW1V8r/exec";
@@ -2236,17 +2384,14 @@
                 const result = await response.json();
                 
                 if (result.success) {
-                    // Сохраняем данные пользователя
                     CURRENT_USER.id = login;
                     CURRENT_USER.name = result.name || login;
                     CURRENT_USER.role = result.role || 'artist';
                     CURRENT_USER.sheetUrl = result.sheetUrl || '#';
                     
-                    // Сохраняем авторизацию на 24 часа
                     localStorage.setItem(`auth_user`, login);
                     localStorage.setItem(`auth_time`, Date.now());
                     
-                    // Обновляем интерфейс
                     document.getElementById('loginOverlay').style.display = 'none';
                     document.getElementById('mainContent').style.display = 'block';
                     
@@ -2258,12 +2403,10 @@
                         sheetLink.href = CURRENT_USER.sheetUrl;
                     }
                     
-                    // Если организатор — добавляем кнопку статистики
                     if (CURRENT_USER.role === 'organizer') {
                         addGlobalStatsButton();
                     }
                     
-                    // Инициализируем приложение
                     initApp();
                 } else {
                     errorMsg.style.display = 'block';
@@ -2311,7 +2454,7 @@
                             <td class="text-right">${s.totalItems || 0} шт</td>
                           </tr>`;
             }
-            html += '</tbody></table>';
+            html += '</tbody></tr>';
             return html;
         }
         
@@ -2339,15 +2482,12 @@
             document.getElementById('errorMsg').style.display = 'none';
         }
         
-        // Проверка сохранённой авторизации
         function checkExistingAuth() {
             const savedUser = localStorage.getItem('auth_user');
             const authTime = localStorage.getItem('auth_time');
             
             if (savedUser && authTime && (Date.now() - parseInt(authTime)) < 24 * 60 * 60 * 1000) {
-                // Автоматически восстанавливаем сессию
                 document.getElementById('loginInput').value = savedUser;
-                const fakeEvent = { preventDefault: () => {} };
                 login();
             } else {
                 document.getElementById('loginOverlay').style.display = 'flex';
@@ -2355,26 +2495,7 @@
             }
         }
         
-        // ========== ИНИЦИАЛИЗАЦИЯ ПРИЛОЖЕНИЯ ==========
-        function initApp() {
-            initCustomSelects();
-            loadRules();
-            loadHistory();
-            loadExtraCosts();
-            initDateTimeSelects();
-            bindDateTimeEvents();
-            initCustomOrder();
-            loadData(true, true);
-            startAutoRefresh();
-            startHistoryAutoSync();
-        }
-        
-        // ========== ВЕСЬ ОСТАЛЬНОЙ КОД ИЗ ТВОЕГО ФАЙЛА ==========
-        // (все функции от let originalCardsData = [] до конца)
-        // ОНИ ОСТАЮТСЯ БЕЗ ИЗМЕНЕНИЙ!
-        
-        // Важно: ВСЕ ВЫЗОВЫ fetch ДОЛЖНЫ ИСПОЛЬЗОВАТЬ buildApiUrl()
-        
+        // ========== ОСНОВНЫЕ ПЕРЕМЕННЫЕ ==========
         let originalCardsData = [];
         let currentFilteredData = [];
         let isLoading = false;
@@ -2405,6 +2526,7 @@
             return typeColors.get(type);
         }
 
+        // ========== РЕДАКТИРОВАНИЕ ТОВАРА ==========
         function openEditProductModal(index) {
             currentEditIndex = index;
             const card = originalCardsData[index];
@@ -2441,6 +2563,7 @@
             showToast(`Товар "${card.name}" обновлён`, true);
         }
 
+        // ========== СКИДКИ ==========
         function toggleDiscountPanel() {
             discountPanelOpen = !discountPanelOpen;
             const content = document.getElementById('discount-content');
@@ -2601,6 +2724,7 @@
             showToast("Скидки на товары сброшены", true);
         }
 
+        // ========== ДОПОЛНИТЕЛЬНЫЕ РАСХОДЫ ==========
         let extraCosts = [];
 
         async function syncExtraCostsToServer() {
@@ -2668,6 +2792,7 @@
             if (document.getElementById('statsModal')?.style.display === 'block') renderStats();
         }
 
+        // ========== ИСТОРИЯ ПРОДАЖ ==========
         let salesHistory = [];
         let historyMethodFilter = "all";
         let historyTypeFilter = "all";
@@ -2795,6 +2920,7 @@
             }
         }
 
+        // ========== ПРАВИЛА ==========
         let rulesList = [];
         let currentRuleType = "type";
         let selectedProducts = new Set();
@@ -2873,195 +2999,6 @@
                 updateCartUI();
                 showToast(`Правило ${rulesList[index].active ? 'активировано' : 'деактивировано'}`, true);
             }
-        }
-
-        function initDateTimeSelects() {
-            const currentYear = new Date().getFullYear();
-            const years = [];
-            for (let i = currentYear - 2; i <= currentYear + 2; i++) years.push(i);
-            const monthNames = ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'];
-
-            ['dateFromDay', 'dateToDay'].forEach(id => {
-                const select = document.getElementById(id);
-                if (select) {
-                    select.innerHTML = '';
-                    for (let i = 1; i <= 31; i++) {
-                        const option = document.createElement('option');
-                        option.value = i;
-                        option.textContent = i.toString().padStart(2, '0');
-                        select.appendChild(option);
-                    }
-                }
-            });
-
-            ['dateFromMonth', 'dateToMonth'].forEach(id => {
-                const select = document.getElementById(id);
-                if (select) {
-                    select.innerHTML = '';
-                    for (let i = 0; i < 12; i++) {
-                        const option = document.createElement('option');
-                        option.value = i + 1;
-                        option.textContent = monthNames[i];
-                        select.appendChild(option);
-                    }
-                }
-            });
-
-            ['dateFromYear', 'dateToYear'].forEach(id => {
-                const select = document.getElementById(id);
-                if (select) {
-                    select.innerHTML = '';
-                    for (const year of years) {
-                        const option = document.createElement('option');
-                        option.value = year;
-                        option.textContent = year;
-                        select.appendChild(option);
-                    }
-                }
-            });
-
-            ['timeFromHour', 'timeToHour'].forEach(id => {
-                const select = document.getElementById(id);
-                if (select) {
-                    select.innerHTML = '';
-                    for (let i = 0; i <= 23; i++) {
-                        const option = document.createElement('option');
-                        option.value = i;
-                        option.textContent = i.toString().padStart(2, '0');
-                        select.appendChild(option);
-                    }
-                }
-            });
-
-            ['timeFromMinute', 'timeToMinute'].forEach(id => {
-                const select = document.getElementById(id);
-                if (select) {
-                    select.innerHTML = '';
-                    for (let i = 0; i <= 59; i++) {
-                        const option = document.createElement('option');
-                        option.value = i;
-                        option.textContent = i.toString().padStart(2, '0');
-                        select.appendChild(option);
-                    }
-                }
-            });
-        }
-
-        function getDateTimeFromSelects(prefix) {
-            const day = document.getElementById(`${prefix}Day`)?.value;
-            const month = document.getElementById(`${prefix}Month`)?.value;
-            const year = document.getElementById(`${prefix}Year`)?.value;
-            const hour = document.getElementById(`time${prefix === 'dateFrom' ? 'From' : 'To'}Hour`)?.value;
-            const minute = document.getElementById(`time${prefix === 'dateFrom' ? 'From' : 'To'}Minute`)?.value;
-            if (day && month && year && hour && minute) {
-                return new Date(parseInt(year), parseInt(month) - 1, parseInt(day), parseInt(hour), parseInt(minute));
-            }
-            return null;
-        }
-
-        function resetHistoryFilters() {
-            historyMethodFilter = "all";
-            historyTypeFilter = "all";
-            document.querySelectorAll('[data-method], [data-type]').forEach(btn => btn.classList.remove('active'));
-            document.querySelector('[data-method="all"]')?.classList.add('active');
-            document.querySelector('[data-type="all"]')?.classList.add('active');
-
-            const now = new Date();
-            const currentYear = now.getFullYear();
-            const currentMonth = now.getMonth() + 1;
-            const currentDay = now.getDate();
-
-            const fromDay = document.getElementById('dateFromDay');
-            const fromMonth = document.getElementById('dateFromMonth');
-            const fromYear = document.getElementById('dateFromYear');
-            const fromHour = document.getElementById('timeFromHour');
-            const fromMinute = document.getElementById('timeFromMinute');
-            if (fromDay) fromDay.value = currentDay;
-            if (fromMonth) fromMonth.value = currentMonth;
-            if (fromYear) fromYear.value = currentYear;
-            if (fromHour) fromHour.value = 0;
-            if (fromMinute) fromMinute.value = 0;
-
-            const toDay = document.getElementById('dateToDay');
-            const toMonth = document.getElementById('dateToMonth');
-            const toYear = document.getElementById('dateToYear');
-            const toHour = document.getElementById('timeToHour');
-            const toMinute = document.getElementById('timeToMinute');
-            if (toDay) toDay.value = currentDay;
-            if (toMonth) toMonth.value = currentMonth;
-            if (toYear) toYear.value = currentYear;
-            if (toHour) toHour.value = 23;
-            if (toMinute) toMinute.value = 59;
-
-            const minPrice = document.getElementById('historyMinPrice');
-            const maxPrice = document.getElementById('historyMaxPrice');
-            if (minPrice) minPrice.value = '0';
-            if (maxPrice) maxPrice.value = '';
-
-            renderHistoryList();
-        }
-
-        function renderHistoryList() {
-            const container = document.getElementById('history-list');
-            if (!container) return;
-
-            const fromDate = getDateTimeFromSelects('dateFrom');
-            const toDate = getDateTimeFromSelects('dateTo');
-            const minPrice = parseInt(document.getElementById('historyMinPrice')?.value) || 0;
-            const maxPrice = parseInt(document.getElementById('historyMaxPrice')?.value) || Infinity;
-
-            let filtered = [...salesHistory];
-
-            if (historyMethodFilter === 'basket') filtered = filtered.filter(e => e.method === 'basket');
-            else if (historyMethodFilter === 'single') filtered = filtered.filter(e => e.method === 'single');
-
-            if (historyTypeFilter === 'sale') filtered = filtered.filter(e => !e.isReturn);
-            else if (historyTypeFilter === 'return') filtered = filtered.filter(e => e.isReturn === true);
-
-            if (fromDate) filtered = filtered.filter(e => new Date(e.date) >= fromDate);
-            if (toDate) filtered = filtered.filter(e => new Date(e.date) <= toDate);
-            filtered = filtered.filter(e => e.total >= minPrice && e.total <= maxPrice);
-
-            if (filtered.length === 0) {
-                container.innerHTML = '<div class="empty-cart">🍌 История пуста</div>';
-                return;
-            }
-
-            let html = '';
-            for (const entry of filtered) {
-                const date = new Date(entry.date);
-                const dateStr = date.toLocaleString('ru-RU', {
-                    day: '2-digit',
-                    month: '2-digit',
-                    year: '2-digit',
-                    hour: '2-digit',
-                    minute: '2-digit'
-                });
-                const isBasket = entry.method === 'basket';
-                const isReturn = entry.isReturn;
-
-                let itemsHtml = '';
-                for (const item of entry.items) {
-                    itemsHtml += `<div>• ${item.name}: ${item.qty} шт × ${item.price} ₽ = ${item.qty * item.price} ₽</div>`;
-                }
-
-                const methodLabel = isBasket ? 'Корзина' : 'Поштучно';
-                const methodClass = isBasket ? 'history-badge-method-basket' : 'history-badge-method-single';
-                const actionLabel = isReturn ? 'Возврат' : 'Продажа';
-                const actionClass = isReturn ? 'history-badge-type-return' : 'history-badge-type-sale';
-
-                html += `
-                    <div class="history-item">
-                        <div class="history-content">
-                            <div class="history-date">${dateStr} <span class="history-badge ${methodClass}">${methodLabel}</span> <span class="history-badge ${actionClass}">${actionLabel}</span></div>
-                            <div class="history-details">${itemsHtml}</div>
-                            <div class="${isReturn ? 'history-return' : 'history-sale'}">${isReturn ? '↩️' : '💰'} Итого: ${entry.total} ₽</div>
-                        </div>
-                        <button class="history-delete-btn" onclick="deleteHistoryEntry('${entry.id}')" title="Удалить запись">🗑</button>
-                    </div>
-                `;
-            }
-            container.innerHTML = html;
         }
 
         function selectRuleType(type) {
@@ -3301,72 +3238,1179 @@
             closeAllRuleSelects();
         }
 
-        function checkRulesForCart() {
-            const cartItems = Object.entries(cart);
-            if (cartItems.length === 0) return [];
-            if (!originalCardsData.length) return [];
+        // ========== ДАТА И ВРЕМЯ ДЛЯ ИСТОРИИ ==========
+        function initDateTimeSelects() {
+            const currentYear = new Date().getFullYear();
+            const years = [];
+            for (let i = currentYear - 2; i <= currentYear + 2; i++) years.push(i);
+            const monthNames = ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'];
 
-            const cartInfo = {};
-            let totalPrice = 0;
-            for (const [idxStr, qty] of cartItems) {
+            ['dateFromDay', 'dateToDay'].forEach(id => {
+                const select = document.getElementById(id);
+                if (select) {
+                    select.innerHTML = '';
+                    for (let i = 1; i <= 31; i++) {
+                        const option = document.createElement('option');
+                        option.value = i;
+                        option.textContent = i.toString().padStart(2, '0');
+                        select.appendChild(option);
+                    }
+                }
+            });
+
+            ['dateFromMonth', 'dateToMonth'].forEach(id => {
+                const select = document.getElementById(id);
+                if (select) {
+                    select.innerHTML = '';
+                    for (let i = 0; i < 12; i++) {
+                        const option = document.createElement('option');
+                        option.value = i + 1;
+                        option.textContent = monthNames[i];
+                        select.appendChild(option);
+                    }
+                }
+            });
+
+            ['dateFromYear', 'dateToYear'].forEach(id => {
+                const select = document.getElementById(id);
+                if (select) {
+                    select.innerHTML = '';
+                    for (const year of years) {
+                        const option = document.createElement('option');
+                        option.value = year;
+                        option.textContent = year;
+                        select.appendChild(option);
+                    }
+                }
+            });
+
+            ['timeFromHour', 'timeToHour'].forEach(id => {
+                const select = document.getElementById(id);
+                if (select) {
+                    select.innerHTML = '';
+                    for (let i = 0; i <= 23; i++) {
+                        const option = document.createElement('option');
+                        option.value = i;
+                        option.textContent = i.toString().padStart(2, '0');
+                        select.appendChild(option);
+                    }
+                }
+            });
+
+            ['timeFromMinute', 'timeToMinute'].forEach(id => {
+                const select = document.getElementById(id);
+                if (select) {
+                    select.innerHTML = '';
+                    for (let i = 0; i <= 59; i++) {
+                        const option = document.createElement('option');
+                        option.value = i;
+                        option.textContent = i.toString().padStart(2, '0');
+                        select.appendChild(option);
+                    }
+                }
+            });
+        }
+
+        function getDateTimeFromSelects(prefix) {
+            const day = document.getElementById(`${prefix}Day`)?.value;
+            const month = document.getElementById(`${prefix}Month`)?.value;
+            const year = document.getElementById(`${prefix}Year`)?.value;
+            const hour = document.getElementById(`time${prefix === 'dateFrom' ? 'From' : 'To'}Hour`)?.value;
+            const minute = document.getElementById(`time${prefix === 'dateFrom' ? 'From' : 'To'}Minute`)?.value;
+            if (day && month && year && hour && minute) {
+                return new Date(parseInt(year), parseInt(month) - 1, parseInt(day), parseInt(hour), parseInt(minute));
+            }
+            return null;
+        }
+
+        function resetHistoryFilters() {
+            historyMethodFilter = "all";
+            historyTypeFilter = "all";
+            document.querySelectorAll('[data-method], [data-type]').forEach(btn => btn.classList.remove('active'));
+            document.querySelector('[data-method="all"]')?.classList.add('active');
+            document.querySelector('[data-type="all"]')?.classList.add('active');
+
+            const now = new Date();
+            const currentYear = now.getFullYear();
+            const currentMonth = now.getMonth() + 1;
+            const currentDay = now.getDate();
+
+            const fromDay = document.getElementById('dateFromDay');
+            const fromMonth = document.getElementById('dateFromMonth');
+            const fromYear = document.getElementById('dateFromYear');
+            const fromHour = document.getElementById('timeFromHour');
+            const fromMinute = document.getElementById('timeFromMinute');
+            if (fromDay) fromDay.value = currentDay;
+            if (fromMonth) fromMonth.value = currentMonth;
+            if (fromYear) fromYear.value = currentYear;
+            if (fromHour) fromHour.value = 0;
+            if (fromMinute) fromMinute.value = 0;
+
+            const toDay = document.getElementById('dateToDay');
+            const toMonth = document.getElementById('dateToMonth');
+            const toYear = document.getElementById('dateToYear');
+            const toHour = document.getElementById('timeToHour');
+            const toMinute = document.getElementById('timeToMinute');
+            if (toDay) toDay.value = currentDay;
+            if (toMonth) toMonth.value = currentMonth;
+            if (toYear) toYear.value = currentYear;
+            if (toHour) toHour.value = 23;
+            if (toMinute) toMinute.value = 59;
+
+            const minPrice = document.getElementById('historyMinPrice');
+            const maxPrice = document.getElementById('historyMaxPrice');
+            if (minPrice) minPrice.value = '0';
+            if (maxPrice) maxPrice.value = '';
+
+            renderHistoryList();
+        }
+
+        function renderHistoryList() {
+            const container = document.getElementById('history-list');
+            if (!container) return;
+
+            const fromDate = getDateTimeFromSelects('dateFrom');
+            const toDate = getDateTimeFromSelects('dateTo');
+            const minPrice = parseInt(document.getElementById('historyMinPrice')?.value) || 0;
+            const maxPrice = parseInt(document.getElementById('historyMaxPrice')?.value) || Infinity;
+
+            let filtered = [...salesHistory];
+
+            if (historyMethodFilter === 'basket') filtered = filtered.filter(e => e.method === 'basket');
+            else if (historyMethodFilter === 'single') filtered = filtered.filter(e => e.method === 'single');
+
+            if (historyTypeFilter === 'sale') filtered = filtered.filter(e => !e.isReturn);
+            else if (historyTypeFilter === 'return') filtered = filtered.filter(e => e.isReturn === true);
+
+            if (fromDate) filtered = filtered.filter(e => new Date(e.date) >= fromDate);
+            if (toDate) filtered = filtered.filter(e => new Date(e.date) <= toDate);
+            filtered = filtered.filter(e => e.total >= minPrice && e.total <= maxPrice);
+
+            if (filtered.length === 0) {
+                container.innerHTML = '<div class="empty-cart">🍌 История пуста</div>';
+                return;
+            }
+
+            let html = '';
+            for (const entry of filtered) {
+                const date = new Date(entry.date);
+                const dateStr = date.toLocaleString('ru-RU', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: '2-digit',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+                const isBasket = entry.method === 'basket';
+                const isReturn = entry.isReturn;
+
+                let itemsHtml = '';
+                for (const item of entry.items) {
+                    itemsHtml += `<div>• ${item.name}: ${item.qty} шт × ${item.price} ₽ = ${item.qty * item.price} ₽</div>`;
+                }
+
+                const methodLabel = isBasket ? 'Корзина' : 'Поштучно';
+                const methodClass = isBasket ? 'history-badge-method-basket' : 'history-badge-method-single';
+                const actionLabel = isReturn ? 'Возврат' : 'Продажа';
+                const actionClass = isReturn ? 'history-badge-type-return' : 'history-badge-type-sale';
+
+                html += `
+                    <div class="history-item">
+                        <div class="history-content">
+                            <div class="history-date">${dateStr} <span class="history-badge ${methodClass}">${methodLabel}</span> <span class="history-badge ${actionClass}">${actionLabel}</span></div>
+                            <div class="history-details">${itemsHtml}</div>
+                            <div class="${isReturn ? 'history-return' : 'history-sale'}">${isReturn ? '↩️' : '💰'} Итого: ${entry.total} ₽</div>
+                        </div>
+                        <button class="history-delete-btn" onclick="deleteHistoryEntry('${entry.id}')" title="Удалить запись">🗑</button>
+                    </div>
+                `;
+            }
+            container.innerHTML = html;
+        }
+
+        // ========== ФИЛЬТРАЦИЯ И СОРТИРОВКА ==========
+        function updateTypeFilterTrigger() {
+            const trigger = document.getElementById('typeFilterTrigger');
+            if (!trigger) return;
+            if (selectedTypes.size === 0) trigger.textContent = 'Все типы мерча';
+            else if (selectedTypes.size === 1) trigger.textContent = Array.from(selectedTypes)[0];
+            else trigger.textContent = `Выбрано: ${selectedTypes.size}`;
+        }
+
+        function buildTypeMultiSelect() {
+            const dropdown = document.getElementById('typeFilterDropdown');
+            if (!dropdown) return;
+            let tempSelectedTypes = new Set(selectedTypes);
+            let html = '<div class="type-select-list"><div class="filter-option-header">Выберите типы мерча</div>';
+            typeOptions.forEach(type => {
+                const isSelected = tempSelectedTypes.has(type);
+                html += `<div class="type-select-item ${isSelected ? 'selected' : ''}" data-type="${escapeHtml(type)}">
+                            <span>${escapeHtml(type)}</span>
+                            ${isSelected ? '<span class="type-select-check">✓</span>' : ''}
+                        </div>`;
+            });
+            html += '</div><div class="filter-buttons"><button class="filter-reset-btn" id="typeResetBtn">Сбросить</button><button class="filter-apply-btn" id="typeApplyBtn">Применить</button></div>';
+            dropdown.innerHTML = html;
+            document.querySelectorAll('.type-select-item').forEach(item => {
+                item.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const type = item.dataset.type;
+                    if (tempSelectedTypes.has(type)) tempSelectedTypes.delete(type);
+                    else tempSelectedTypes.add(type);
+                    const items = document.querySelectorAll('.type-select-item');
+                    items.forEach(it => {
+                        if (it.dataset.type === type) {
+                            if (tempSelectedTypes.has(type)) {
+                                it.classList.add('selected');
+                                if (!it.querySelector('.type-select-check')) it.innerHTML += '<span class="type-select-check">✓</span>';
+                            } else {
+                                it.classList.remove('selected');
+                                const checkSpan = it.querySelector('.type-select-check');
+                                if (checkSpan) checkSpan.remove();
+                            }
+                        }
+                    });
+                });
+            });
+            const resetBtn = document.getElementById('typeResetBtn');
+            const applyBtn = document.getElementById('typeApplyBtn');
+            if (resetBtn) {
+                resetBtn.onclick = (e) => {
+                    e.stopPropagation();
+                    tempSelectedTypes.clear();
+                    const items = document.querySelectorAll('.type-select-item');
+                    items.forEach(item => {
+                        item.classList.remove('selected');
+                        const checkSpan = item.querySelector('.type-select-check');
+                        if (checkSpan) checkSpan.remove();
+                    });
+                };
+            }
+            if (applyBtn) {
+                applyBtn.onclick = (e) => {
+                    e.stopPropagation();
+                    selectedTypes = new Set(tempSelectedTypes);
+                    updateTypeFilterTrigger();
+                    document.getElementById('typeFilterDropdown').classList.remove('show');
+                    filterAndSort();
+                };
+            }
+        }
+
+        function sortByRevenue(data) {
+            const revenueMap = new Map();
+            const sales = salesHistory.filter(entry => !entry.isReturn);
+            for (const sale of sales) {
+                for (const item of sale.items) {
+                    const currentRevenue = revenueMap.get(item.name) || 0;
+                    revenueMap.set(item.name, currentRevenue + (item.qty * item.price));
+                }
+            }
+            return [...data].sort((a, b) => {
+                const revenueA = revenueMap.get(a.name) || 0;
+                const revenueB = revenueMap.get(b.name) || 0;
+                const isOutOfStockA = (a.stock || 0) === 0;
+                const isOutOfStockB = (b.stock || 0) === 0;
+                if (isOutOfStockA && !isOutOfStockB) return 1;
+                if (!isOutOfStockA && isOutOfStockB) return -1;
+                return revenueB - revenueA;
+            });
+        }
+
+        // ========== ПОЛЬЗОВАТЕЛЬСКИЙ ПОРЯДОК ==========
+        function saveCustomOrder() {
+            const order = [];
+            document.querySelectorAll('#cards-container .card').forEach(card => {
+                const name = card.querySelector('.name')?.textContent;
+                if (name) {
+                    const originalCard = originalCardsData.find(c => c.name === name);
+                    if (originalCard) {
+                        order.push(originalCardsData.findIndex(c => c.name === name));
+                    }
+                }
+            });
+            if (order.length === originalCardsData.length) {
+                customOrder = order;
+                localStorage.setItem('merch_custom_order', JSON.stringify(customOrder));
+                syncCustomOrderToServer();
+            }
+        }
+
+        async function syncCustomOrderToServer() {
+            try {
+                const data = encodeURIComponent(JSON.stringify(customOrder));
+                await fetch(buildApiUrl("syncCustomOrder", `&data=${data}`));
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        async function loadCustomOrderFromServer() {
+            try {
+                const response = await fetch(buildApiUrl("getCustomOrder"));
+                const data = await response.json();
+                if (data && data.order && Array.isArray(data.order)) {
+                    customOrder = data.order;
+                    localStorage.setItem('merch_custom_order', JSON.stringify(customOrder));
+                    return true;
+                }
+                return false;
+            } catch (e) {
+                return false;
+            }
+        }
+
+        function loadCustomOrder() {
+            const saved = localStorage.getItem('merch_custom_order');
+            if (saved) {
+                try {
+                    customOrder = JSON.parse(saved);
+                } catch (e) {
+                    customOrder = [];
+                }
+            } else {
+                customOrder = [];
+            }
+        }
+
+        async function initCustomOrder() {
+            const loaded = await loadCustomOrderFromServer();
+            if (!loaded) {
+                loadCustomOrder();
+            }
+        }
+
+        function applyCustomOrder(data) {
+            if (!customOrder.length || customOrder.length !== data.length) {
+                return data;
+            }
+            const ordered = [];
+            for (const idx of customOrder) {
+                if (data[idx]) ordered.push(data[idx]);
+            }
+            for (const item of data) {
+                if (!ordered.includes(item)) ordered.push(item);
+            }
+            return ordered;
+        }
+
+        // ========== DRAG & DROP ==========
+        function dragStartHandler(e, index) {
+            dragStartIndex = index;
+            e.target.closest('.card')?.classList.add('dragging');
+        }
+
+        function dragEndHandler(e) {
+            e.target.closest('.card')?.classList.remove('dragging');
+            dragStartIndex = null;
+        }
+
+        function dragOverHandler(e) {
+            e.preventDefault();
+            const card = e.target.closest('.card');
+            if (card) card.classList.add('drag-over');
+        }
+
+        function dragLeaveHandler(e) {
+            const card = e.target.closest('.card');
+            if (card) card.classList.remove('drag-over');
+        }
+
+        function dropHandler(e, dropIndex) {
+            e.preventDefault();
+            const card = e.target.closest('.card');
+            if (card) card.classList.remove('drag-over');
+
+            if (dragStartIndex !== null && dragStartIndex !== dropIndex && currentSortBy === 'custom') {
+                const cards = [...currentFilteredData];
+                const [movedCard] = cards.splice(dragStartIndex, 1);
+                cards.splice(dropIndex, 0, movedCard);
+                currentFilteredData = cards;
+                renderCards();
+
+                const newOrder = [];
+                currentFilteredData.forEach(card => {
+                    const originalIndex = originalCardsData.findIndex(orig => orig.name === card.name && orig.type === card.type);
+                    if (originalIndex !== -1) newOrder.push(originalIndex);
+                });
+                customOrder = newOrder;
+                localStorage.setItem('merch_custom_order', JSON.stringify(customOrder));
+                syncCustomOrderToServer();
+            }
+            dragStartIndex = null;
+        }
+
+        // ========== ФИЛЬТРАЦИЯ И СОРТИРОВКА ОСНОВНАЯ ==========
+        function filterAndSort() {
+            let filtered = [...originalCardsData];
+
+            const searchText = document.getElementById('searchInput')?.value.toLowerCase() || '';
+            if (searchText) {
+                filtered = filtered.filter(card => card.name.toLowerCase().includes(searchText));
+            }
+
+            if (selectedTypes.size > 0) {
+                filtered = filtered.filter(card => selectedTypes.has(card.type));
+            }
+
+            if (currentSortBy !== 'none') {
+                switch (currentSortBy) {
+                    case 'name':
+                        filtered.sort((a, b) => a.name.localeCompare(b.name));
+                        break;
+                    case 'stock':
+                        filtered.sort((a, b) => (a.stock || 0) - (b.stock || 0));
+                        break;
+                    case 'stockDesc':
+                        filtered.sort((a, b) => (b.stock || 0) - (a.stock || 0));
+                        break;
+                    case 'priceAsc':
+                        filtered.sort((a, b) => (a.price || 0) - (b.price || 0));
+                        break;
+                    case 'priceDesc':
+                        filtered.sort((a, b) => (b.price || 0) - (a.price || 0));
+                        break;
+                    case 'type':
+                        filtered.sort((a, b) => (a.type || '').localeCompare(b.type || ''));
+                        break;
+                    case 'relevance':
+                        filtered = sortByRevenue(filtered);
+                        break;
+                    case 'custom':
+                        filtered = applyCustomOrder(filtered);
+                        break;
+                }
+            }
+
+            currentFilteredData = filtered;
+            renderCards();
+        }
+
+        // ========== РЕНДЕР КАРТОЧЕК ==========
+        function renderCards() {
+            const container = document.getElementById('cards-container');
+            if (!container) return;
+            container.innerHTML = '';
+
+            if (currentFilteredData.length === 0) {
+                container.innerHTML = '<div class="loading">🍌 Ни одного бананчика не найдено 🍌</div>';
+                return;
+            }
+
+            currentFilteredData.forEach((card, displayIndex) => {
+                const originalIndex = originalCardsData.findIndex(orig => orig.name === card.name && orig.type === card.type);
+                const type = card.type || "";
+                const name = card.name || "Без названия";
+                const total = typeof card.total === 'number' ? card.total : 0;
+                const stock = typeof card.stock === 'number' ? card.stock : 0;
+                const price = typeof card.price === 'number' ? card.price : 0;
+                const isOutOfStock = stock === 0;
+                const typeColor = type ? getTypeColor(type) : '#c25d1a';
+
+                const cardDiv = document.createElement('div');
+                cardDiv.className = `card ${isOutOfStock ? 'out-of-stock' : ''}`;
+                cardDiv.style.position = 'relative';
+                cardDiv.setAttribute('draggable', currentSortBy === 'custom');
+                cardDiv.setAttribute('data-index', displayIndex);
+
+                if (currentSortBy === 'custom') {
+                    cardDiv.addEventListener('dragstart', (e) => dragStartHandler(e, displayIndex));
+                    cardDiv.addEventListener('dragend', dragEndHandler);
+                    cardDiv.addEventListener('dragover', dragOverHandler);
+                    cardDiv.addEventListener('dragleave', dragLeaveHandler);
+                    cardDiv.addEventListener('drop', (e) => dropHandler(e, displayIndex));
+                }
+
+                cardDiv.innerHTML = `
+                    <div class="info">
+                        <div class="title-row">
+                            ${type ? `<span class="type-badge" style="background: ${typeColor}20; color: ${typeColor}; border: 1px solid ${typeColor}40;">${escapeHtml(type)}</span>` : ''}
+                            ${currentSortBy === 'custom' ? '<span class="sort-handle">⋮⋮</span>' : ''}
+                            <span class="name">${escapeHtml(name)}</span>
+                        </div>
+                        <div class="stock-row">
+                            <span class="stock">Остаток: ${stock} шт</span>
+                        </div>
+                        <div class="total-row">
+                            <span class="total">📦 Всего: ${total} шт</span>
+                            <button class="edit-icon" onclick="openEditProductModal(${originalIndex})">✏️</button>
+                        </div>
+                        <div class="price-row">
+                            <span class="price">💰 Цена: ${price} ₽</span>
+                        </div>
+                    </div>
+                    <div class="buttons">
+                        <button class="minus" data-index="${originalIndex}" data-delta="-1">−1</button>
+                        <button class="plus" data-index="${originalIndex}" data-delta="+1">+1</button>
+                        <button class="add-to-cart" data-index="${originalIndex}">➕</button>
+                    </div>
+                `;
+                container.appendChild(cardDiv);
+            });
+
+            document.querySelectorAll('.minus, .plus').forEach(btn => {
+                btn.removeEventListener('click', handleButtonClick);
+                btn.addEventListener('click', handleButtonClick);
+            });
+            document.querySelectorAll('.add-to-cart').forEach(btn => {
+                btn.removeEventListener('click', handleAddToCart);
+                btn.addEventListener('click', handleAddToCart);
+            });
+            updateCardBadges();
+        }
+
+        function handleAddToCart(e) {
+            const btn = e.currentTarget;
+            const index = parseInt(btn.dataset.index);
+            addToCart(index);
+        }
+
+        async function handleButtonClick(e) {
+            const btn = e.currentTarget;
+            const index = parseInt(btn.dataset.index);
+            const delta = parseInt(btn.dataset.delta);
+            await updateStock(index, delta);
+        }
+
+        function initSortSelect() {
+            const sortTrigger = document.getElementById('sortByTrigger');
+            const sortDropdown = document.getElementById('sortByDropdown');
+
+            const sortOptions = [
+                { value: "none", label: "Без сортировки" },
+                { value: "relevance", label: "По выручке" },
+                { value: "name", label: "По названию" },
+                { value: "stock", label: "По остатку: сначала мало" },
+                { value: "stockDesc", label: "По остатку: сначала много" },
+                { value: "priceAsc", label: "По цене: сначала дешёвое" },
+                { value: "priceDesc", label: "По цене: сначала дорогое" },
+                { value: "type", label: "По типу" },
+                { value: "custom", label: "Пользовательская" }
+            ];
+
+            function buildSortDropdown() {
+                sortDropdown.innerHTML = '';
+                const header = document.createElement('div');
+                header.className = 'filter-option-header';
+                header.textContent = 'Выберите сортировку';
+                sortDropdown.appendChild(header);
+
+                sortOptions.forEach(opt => {
+                    const div = document.createElement('div');
+                    div.className = 'sort-option';
+                    if (currentSortBy === opt.value) div.classList.add('active');
+                    div.textContent = opt.label;
+                    div.onclick = (e) => {
+                        e.stopPropagation();
+                        document.querySelectorAll('.sort-option').forEach(optDiv => optDiv.classList.remove('active'));
+                        div.classList.add('active');
+                        currentSortBy = opt.value;
+                        sortTrigger.textContent = opt.label;
+
+                        if (currentSortBy === 'custom') {
+                            initCustomOrder().then(() => filterAndSort());
+                        } else {
+                            filterAndSort();
+                        }
+                        sortDropdown.classList.remove('show');
+                    };
+                    sortDropdown.appendChild(div);
+                });
+            }
+
+            function closeSortDropdown() {
+                sortDropdown.classList.remove('show');
+            }
+
+            sortTrigger.onclick = (e) => {
+                e.stopPropagation();
+                sortDropdown.classList.toggle('show');
+            };
+            document.addEventListener('click', () => closeSortDropdown());
+            buildSortDropdown();
+        }
+
+        function initCustomSelects() {
+            initSortSelect();
+
+            const typeTrigger = document.getElementById('typeFilterTrigger');
+            const typeDropdown = document.getElementById('typeFilterDropdown');
+
+            function closeTypeDropdown() {
+                typeDropdown.classList.remove('show');
+            }
+
+            typeTrigger.onclick = (e) => {
+                e.stopPropagation();
+                typeDropdown.classList.toggle('show');
+                buildTypeMultiSelect();
+            };
+
+            document.addEventListener('click', (e) => {
+                if (!typeTrigger.contains(e.target) && !typeDropdown.contains(e.target)) {
+                    closeTypeDropdown();
+                }
+            });
+        }
+
+        function updateTypeOptions() {
+            const types = new Set();
+            originalCardsData.forEach(card => {
+                if (card.type && card.type.trim()) types.add(card.type);
+            });
+            typeOptions = Array.from(types).sort();
+            selectedTypes.forEach(type => {
+                if (!typeOptions.includes(type)) selectedTypes.delete(type);
+            });
+            updateTypeFilterTrigger();
+        }
+
+        // ========== ОБНОВЛЕНИЕ ВРЕМЕНИ И ПРОГРЕСС ==========
+        function showUpdateTime() {
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString('ru-RU', {
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            });
+            const timeElement = document.getElementById('update-time');
+            if (timeElement) timeElement.innerText = `Обновлено: ${timeStr} 🍌`;
+        }
+
+        function showProgressBar() {
+            const container = document.getElementById('progressContainer');
+            const bar = document.getElementById('progressBar');
+            if (container && bar) {
+                container.style.display = 'block';
+                container.classList.add('active');
+                bar.style.width = '0%';
+                setTimeout(() => {
+                    if (bar) bar.style.width = '90%';
+                }, 50);
+            }
+        }
+
+        function hideProgressBar() {
+            const container = document.getElementById('progressContainer');
+            const bar = document.getElementById('progressBar');
+            if (container && bar) {
+                bar.style.width = '100%';
+                setTimeout(() => {
+                    container.style.display = 'none';
+                    container.classList.remove('active');
+                    bar.style.width = '0%';
+                }, 300);
+            }
+        }
+
+        // ========== ЗАГРУЗКА ДАННЫХ ==========
+        async function loadData(showLoading = true, showProgress = false) {
+            if (isLoading) return;
+            isLoading = true;
+            const isAutoRefresh = showProgress && !showLoading;
+
+            if (!isAutoRefresh) {
+                const autoRefreshBadge = document.querySelector('.auto-refresh-badge');
+                if (autoRefreshBadge) {
+                    autoRefreshBadge.style.opacity = '0';
+                    autoRefreshBadge.style.visibility = 'hidden';
+                }
+                if (showProgress) showProgressBar();
+                if (showLoading) {
+                    const container = document.getElementById('cards-container');
+                    if (container) container.innerHTML = '<div class="loading">Загрузка бананчиков...</div>';
+                }
+            }
+
+            try {
+                const response = await fetch(buildApiUrl("get"));
+                const data = await response.json();
+
+                if (data && data.length > 0) {
+                    originalCardsData = data;
+                    updateTypeOptions();
+                    filterAndSort();
+                    showUpdateTime();
+                    updateCartUI();
+                } else if (showLoading && !isAutoRefresh) {
+                    const container = document.getElementById('cards-container');
+                    if (container) container.innerHTML = '<div class="loading">Нет данных. Проверьте таблицу и лист "Мерч". 🍌</div>';
+                }
+            } catch (error) {
+                console.error(error);
+                if (showLoading && !isAutoRefresh) {
+                    const container = document.getElementById('cards-container');
+                    if (container) container.innerHTML = '<div class="loading">Ошибка загрузки. Проверьте интернет и ссылку. 🍌</div>';
+                }
+            } finally {
+                isLoading = false;
+                if (!isAutoRefresh) {
+                    if (showProgress) hideProgressBar();
+                    const autoRefreshBadge = document.querySelector('.auto-refresh-badge');
+                    if (autoRefreshBadge) {
+                        autoRefreshBadge.style.opacity = '';
+                        autoRefreshBadge.style.visibility = '';
+                    }
+                }
+            }
+        }
+
+        // ========== КОРЗИНА И ПРОДАЖИ ==========
+        let cart = {};
+
+        function updateCardBadges() {
+            document.querySelectorAll('.card').forEach(card => {
+                const minusBtn = card.querySelector('.minus');
+                if (minusBtn) {
+                    const idx = parseInt(minusBtn.dataset.index);
+                    let badge = card.querySelector('.cart-qty-badge');
+                    if (cart.hasOwnProperty(idx) && cart[idx] > 0) {
+                        const qtyInCart = cart[idx];
+                        if (!badge) {
+                            badge = document.createElement('div');
+                            badge.className = 'cart-qty-badge';
+                            card.style.position = 'relative';
+                            card.appendChild(badge);
+                        }
+                        badge.textContent = qtyInCart;
+                        badge.style.background = 'var(--btn-bg)';
+                    } else {
+                        if (badge) badge.remove();
+                    }
+                }
+            });
+        }
+
+        function getBestDiscountForItem(idx, originalPrice, qty, subtotal) {
+            let finalPrice = originalPrice;
+            let discountValue = 0;
+            let discountType = null;
+            if (itemDiscounts[idx]) {
+                const disc = itemDiscounts[idx];
+                discountType = disc.type;
+                if (disc.type === 'percent') {
+                    finalPrice = originalPrice * (1 - disc.value / 100);
+                    discountValue = disc.value;
+                } else if (disc.type === 'fixed') {
+                    const discountPerItem = disc.value;
+                    finalPrice = Math.max(0, originalPrice - discountPerItem);
+                    discountValue = discountPerItem;
+                }
+            }
+            return { price: finalPrice, discountValue: discountValue, discountType: discountType };
+        }
+
+        function updateCartUI() {
+            const totalPositiveCount = Object.values(cart).reduce((a, b) => a + (b > 0 ? b : 0), 0);
+            const cartCountSpan = document.getElementById('cartCount');
+            if (cartCountSpan) cartCountSpan.textContent = totalPositiveCount;
+            const cartItemsDiv = document.getElementById('cart-items-list');
+            const cartTotalDiv = document.getElementById('cart-total');
+            const cartActionsDiv = document.getElementById('cart-actions');
+            const discountPanelDiv = document.getElementById('discount-panel');
+
+            if (!cartItemsDiv) return;
+            const hasAny = Object.keys(cart).length > 0;
+
+            if (discountPanelDiv) {
+                discountPanelDiv.style.display = hasAny ? 'block' : 'none';
+            }
+
+            if (!hasAny) {
+                cartItemsDiv.innerHTML = '<div class="empty-cart">🍌 Корзина пуста</div>';
+                if (cartTotalDiv) cartTotalDiv.style.display = 'none';
+                if (cartActionsDiv) cartActionsDiv.style.display = 'none';
+                updateCardBadges();
+                return;
+            }
+
+            let discountHtml = `
+                <div class="discount-section">
+                    <div class="discount-header" onclick="toggleDiscountPanel()">
+                        <span class="discount-title">🎯 Скидки</span>
+                        <span class="discount-chevron" id="discount-chevron">▼</span>
+                    </div>
+                    <div id="discount-content" class="discount-content" style="display: ${discountPanelOpen ? 'block' : 'none'};">
+                        <div class="discount-group">
+                            <div class="discount-row">
+                                <div class="discount-custom-select">
+                                    <div class="discount-custom-select-trigger" id="itemDiscountSelectTrigger" onclick="event.stopPropagation(); toggleItemDiscountSelect()">%</div>
+                                    <div class="discount-custom-select-dropdown" id="itemDiscountSelectDropdown">
+                                        <div class="discount-select-option" onclick="selectItemDiscountType('percent', '%')">%</div>
+                                        <div class="discount-select-option" onclick="selectItemDiscountType('fixed', '₽')">₽</div>
+                                    </div>
+                                    <input type="hidden" id="itemDiscountTypeSelect" data-value="percent">
+                                </div>
+                                <div class="discount-amount-control">
+                                    <input type="number" id="itemDiscountValue" class="discount-amount-input" placeholder="Сумма" value="0" onchange="updateItemDiscountFromInput()">
+                                    <button class="discount-step-btn" onclick="changeItemDiscountValue(-1)">−</button>
+                                    <button class="discount-step-btn" onclick="changeItemDiscountValue(1)">+</button>
+                                </div>
+                                <button class="discount-products-btn" onclick="toggleDiscountProductsList()">Товары</button>
+                                <button class="discount-all-btn" onclick="selectAllProductsForDiscount()">Всё</button>
+                                <button class="discount-none-btn" onclick="selectNoneProductsForDiscount()">Ничего</button>
+                            </div>
+                            <div id="productDiscountList" style="display: none; margin-top: 8px;"></div>
+                        </div>
+                        <div class="discount-buttons-row">
+                            <button class="discount-action-btn cancel-btn" onclick="closeDiscountPanel()">Отмена</button>
+                            <button class="discount-action-btn reset-btn" onclick="resetItemDiscounts()">Сбросить скидки</button>
+                            <button class="discount-action-btn apply-btn" onclick="applyItemDiscount()">Применить</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            if (discountPanelDiv) discountPanelDiv.innerHTML = discountHtml;
+
+            const activeRules = checkRulesForCart();
+            let total = 0;
+            let html = '';
+
+            if (activeRules.length > 0) {
+                html += `<div style="background: var(--badge-bg); border-radius: 16px; padding: 12px; margin-bottom: 16px; border-left: 4px solid var(--btn-bg);">
+                            <div style="font-size: 13px; font-weight: bold; margin-bottom: 8px; color: var(--badge-text);">✨ Активные правила ✨</div>`;
+                for (const rule of activeRules) {
+                    html += `<div style="display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text-primary); padding: 4px 0;">
+                                <span style="font-size: 16px;">${escapeHtml(rule.icon)}</span>
+                                <span><span class="rule-text-bold">${escapeHtml(rule.message)}</span> <span class="rule-text-normal">${escapeHtml(rule.condition)}</span></span>
+                            </div>`;
+                }
+                html += `</div>`;
+            }
+
+            let subtotal = 0;
+            for (const [idxStr, qty] of Object.entries(cart)) {
+                const idx = parseInt(idxStr);
+                const card = originalCardsData[idx];
+                if (card) subtotal += qty * card.price;
+            }
+
+            for (const [idxStr, qty] of Object.entries(cart)) {
+                const idx = parseInt(idxStr);
+                const card = originalCardsData[idx];
+                if (!card) continue;
+
+                const best = getBestDiscountForItem(idx, card.price, qty, subtotal);
+                const originalItemTotal = card.price * qty;
+                const discountedItemTotal = best.price * qty;
+                total += discountedItemTotal;
+                const isZero = qty === 0;
+                const hasDiscount = best.discountValue > 0;
+
+                let discountText = '';
+                if (hasDiscount) {
+                    if (best.discountType === 'percent') {
+                        discountText = `<div style="font-size: 11px; color: var(--profit-positive);">Скидка: ${best.discountValue}%</div>`;
+                    } else if (best.discountType === 'fixed') {
+                        discountText = `<div style="font-size: 11px; color: var(--profit-positive);">Скидка: ${best.discountValue * qty} ₽</div>`;
+                    }
+                }
+
+                html += `<div class="cart-item ${isZero ? 'disabled' : ''}">
+                            <div class="cart-item-info">
+                                <div class="cart-item-name">${escapeHtml(card.name)}</div>
+                                <div class="cart-item-price">
+                                    ${card.price} ₽ × ${qty} = 
+                                    ${hasDiscount ? `<span class="strikethrough">${originalItemTotal.toFixed(2)} ₽</span> ${discountedItemTotal.toFixed(2)} ₽` : `${originalItemTotal.toFixed(2)} ₽`}
+                                </div>
+                                ${discountText}
+                            </div>
+                            <div class="cart-item-quantity">
+                                <button class="cart-qty-btn" onclick="changeCartQty(${idx}, -1)" ${isZero ? 'disabled' : ''}>−</button>
+                                <span class="cart-item-qty">${qty}</span>
+                                <button class="cart-qty-btn" onclick="changeCartQty(${idx}, 1)">+</button>
+                                <button class="cart-item-remove" onclick="removeFromCart(${idx})">🗑</button>
+                            </div>
+                        </div>`;
+            }
+            cartItemsDiv.innerHTML = html;
+            if (cartTotalDiv) {
+                cartTotalDiv.style.display = 'block';
+                const hasAnyDiscount = Object.values(itemDiscounts).length > 0;
+                if (hasAnyDiscount) {
+                    let discountTotalInfo = '';
+                    let totalDiscountRub = subtotal - total;
+                    discountTotalInfo = ` (скидка ${totalDiscountRub.toFixed(2)} ₽)`;
+                    cartTotalDiv.innerHTML = `<span class="strikethrough">${subtotal.toFixed(2)} ₽</span> ${Math.max(0, total).toFixed(2)} ₽${discountTotalInfo}`;
+                } else {
+                    cartTotalDiv.innerHTML = `🍌 Итого: ${Math.max(0, total).toFixed(2)} ₽`;
+                }
+            }
+            if (cartActionsDiv && totalPositiveCount > 0) cartActionsDiv.style.display = 'flex';
+            else if (cartActionsDiv) cartActionsDiv.style.display = 'none';
+            updateCardBadges();
+        }
+
+        function addToCart(index) {
+            const card = originalCardsData[index];
+            if (!card) return;
+            if (card.stock <= 0) {
+                showToast(`${card.name} закончился!`, false);
+                return;
+            }
+            const currentQty = cart[index] || 0;
+            if (currentQty + 1 > card.stock) {
+                showToast(`Нельзя добавить больше, чем есть (${card.stock} шт)`, false);
+                return;
+            }
+            cart[index] = currentQty + 1;
+            updateCartUI();
+            showToast(`${card.name} +1`, true);
+        }
+
+        function changeCartQty(index, delta) {
+            const card = originalCardsData[index];
+            if (!card) return;
+            const currentQty = cart[index] || 0;
+            const newQty = currentQty + delta;
+            if (newQty < 0) return;
+            if (newQty > card.stock) {
+                showToast(`Нельзя добавить больше, чем есть (${card.stock} шт)`, false);
+                return;
+            }
+            if (newQty === 0) delete cart[index];
+            else cart[index] = newQty;
+            updateCartUI();
+        }
+
+        function removeFromCart(index) {
+            delete cart[index];
+            updateCartUI();
+            const card = originalCardsData[index];
+            if (card) showToast(`${card.name} удалён из корзины`, true);
+        }
+
+        function clearCart() {
+            cart = {};
+            itemDiscounts = {};
+            selectedDiscountProducts.clear();
+            updateCartUI();
+            showToast(`Корзина очищена`, true);
+        }
+
+        function giftCart() {
+            const items = Object.entries(cart).filter(([_, qty]) => qty > 0);
+            if (items.length === 0) {
+                showToast("Нет товаров для подарка", false);
+                return;
+            }
+
+            for (const [idxStr, qty] of items) {
+                const idx = parseInt(idxStr);
+                const card = originalCardsData[idx];
+                if (qty > card.stock) {
+                    showToast(`Не хватает "${card.name}" (нужно ${qty}, есть ${card.stock})`, false);
+                    return;
+                }
+            }
+
+            const historyItems = items.map(([idxStr, qty]) => {
+                const idx = parseInt(idxStr);
+                const card = originalCardsData[idx];
+                return {
+                    name: card.name,
+                    qty: qty,
+                    price: 0
+                };
+            });
+            addToHistory(historyItems, 0, 'gift', false);
+
+            const cartCopy = { ...cart };
+            closeCartModal();
+            cart = {};
+            itemDiscounts = {};
+            selectedDiscountProducts.clear();
+            updateCartUI();
+
+            for (const [idxStr, qty] of Object.entries(cartCopy)) {
                 if (qty === 0) continue;
                 const idx = parseInt(idxStr);
                 const card = originalCardsData[idx];
-                if (card) {
-                    if (!cartInfo[card.name]) cartInfo[card.name] = {
-                        qty: 0,
-                        price: card.price,
-                        type: card.type
-                    };
-                    cartInfo[card.name].qty += qty;
-                    totalPrice += qty * card.price;
+                const newStock = card.stock - qty;
+                card.stock = newStock;
+
+                const cards = document.querySelectorAll('.card');
+                let targetCard = null;
+                for (let i = 0; i < cards.length; i++) {
+                    const minusBtn = cards[i].querySelector('.minus');
+                    if (minusBtn && parseInt(minusBtn.dataset.index) === idx) {
+                        targetCard = cards[i];
+                        break;
+                    }
+                }
+                if (targetCard) {
+                    const stockSpan = targetCard.querySelector('.stock');
+                    if (stockSpan) stockSpan.textContent = `Остаток: ${newStock} шт`;
+                    if (newStock === 0) targetCard.classList.add('out-of-stock');
+                    else targetCard.classList.remove('out-of-stock');
                 }
             }
 
-            const typeQty = {};
-            for (const [name, info] of Object.entries(cartInfo)) {
-                if (info.type) typeQty[info.type] = (typeQty[info.type] || 0) + info.qty;
-            }
-
-            const activeRules = [];
-
-            for (const rule of rulesList) {
-                if (rule.active === false) continue;
-                let isActive = false;
-                let detailText = "";
-                if (rule.type === 'type') {
-                    const qty = typeQty[rule.condition.typeName] || 0;
-                    if (qty >= rule.condition.minQty) {
-                        isActive = true;
-                        detailText = `(в корзине ${qty} шт товаров типа "${rule.condition.typeName}", нужно от ${rule.condition.minQty})`;
+            (async () => {
+                for (const [idxStr, qty] of Object.entries(cartCopy)) {
+                    if (qty === 0) continue;
+                    const idx = parseInt(idxStr);
+                    for (let i = 0; i < qty; i++) {
+                        try {
+                            await fetch(buildApiUrl("update", `&row=${idx}&delta=-1`));
+                        } catch (e) {
+                            console.error(e);
+                        }
                     }
-                } else if (rule.type === 'product') {
-                    let totalQty = 0;
-                    for (const productName of rule.condition.productNames) {
-                        totalQty += cartInfo[productName]?.qty || 0;
-                    }
-                    if (totalQty >= rule.condition.minQty) {
-                        isActive = true;
-                        detailText = `(в корзине ${totalQty} шт товаров из списка, нужно от ${rule.condition.minQty})`;
-                    }
-                } else if (rule.type === 'price') {
-                    if (totalPrice >= rule.condition.minSum) {
-                        isActive = true;
-                        detailText = `(сумма ${totalPrice} ₽, нужно от ${rule.condition.minSum} ₽)`;
-                    }
-                } else if (rule.type === 'bonus') {
-                    isActive = true;
-                    detailText = "";
                 }
-                if (isActive) activeRules.push({
-                    icon: rule.icon || "✨",
-                    message: rule.message,
-                    condition: detailText
-                });
-            }
-            return activeRules;
+                showUpdateTime();
+            })();
+            showToast(`Подарок оформлен!`, true);
         }
 
+        function openCartModal() {
+            const modal = document.getElementById('cartModal');
+            if (modal) {
+                modal.style.display = 'block';
+                discountPanelOpen = false;
+            }
+            updateCartUI();
+        }
+
+        function closeCartModal() {
+            const modal = document.getElementById('cartModal');
+            if (modal) modal.style.display = 'none';
+        }
+
+        async function updateStock(index, delta, silent = false) {
+            const card = originalCardsData[index];
+            if (!card) return;
+            const newStock = card.stock + delta;
+            if (newStock < 0) {
+                if (!silent) showToast("Остаток не может быть меньше 0", false);
+                return;
+            }
+            card.stock = newStock;
+            filterAndSort();
+            try {
+                const response = await fetch(buildApiUrl("update", `&row=${index}&delta=${delta}`));
+                const result = await response.json();
+                if (!result.success && !silent) {
+                    await loadData(true, true);
+                    showToast("Ошибка: " + (result.error || "неизвестная"), false);
+                }
+            } catch (error) {
+                console.error(error);
+                if (!silent) {
+                    await loadData(true, true);
+                    showToast("Ошибка соединения", false);
+                }
+            }
+            updateCardBadges();
+            if (!silent) {
+                if (delta === -1) {
+                    addSingleSaleToHistory(card.name, 1, card.price, false);
+                    showToast(`Продажа: ${card.name} -1 шт`, true);
+                } else if (delta === 1) {
+                    addSingleSaleToHistory(card.name, 1, card.price, true);
+                    showToast(`Возврат: ${card.name} +1 шт`, true);
+                }
+            }
+        }
+
+        async function checkout() {
+            const items = Object.entries(cart).filter(([_, qty]) => qty > 0);
+            if (items.length === 0) {
+                showToast("Нет товаров для продажи", false);
+                return;
+            }
+
+            let subtotal = 0;
+            for (const [idxStr, qty] of items) {
+                const idx = parseInt(idxStr);
+                const card = originalCardsData[idx];
+                subtotal += qty * card.price;
+            }
+
+            let total = 0;
+            for (const [idxStr, qty] of items) {
+                const idx = parseInt(idxStr);
+                const card = originalCardsData[idx];
+                const best = getBestDiscountForItem(idx, card.price, qty, subtotal);
+                total += best.price * qty;
+            }
+
+            for (const [idxStr, qty] of items) {
+                const idx = parseInt(idxStr);
+                const card = originalCardsData[idx];
+                if (qty > card.stock) {
+                    showToast(`Не хватает "${card.name}" (нужно ${qty}, есть ${card.stock})`, false);
+                    return;
+                }
+            }
+
+            const activeRules = checkRulesForCart();
+            if (activeRules.length > 0) {
+                let rulesMessage = "Не забудьте:\n";
+                for (const rule of activeRules) rulesMessage += `• ${rule.message}\n`;
+                showToast(rulesMessage, true);
+            }
+
+            const historyItems = items.map(([idxStr, qty]) => {
+                const idx = parseInt(idxStr);
+                const card = originalCardsData[idx];
+                return {
+                    name: card.name,
+                    qty: qty,
+                    price: card.price
+                };
+            });
+            addToHistory(historyItems, total, 'basket', false);
+
+            const cartCopy = { ...cart };
+            closeCartModal();
+            cart = {};
+            itemDiscounts = {};
+            selectedDiscountProducts.clear();
+            updateCartUI();
+
+            for (const [idxStr, qty] of Object.entries(cartCopy)) {
+                if (qty === 0) continue;
+                const idx = parseInt(idxStr);
+                const card = originalCardsData[idx];
+                const newStock = card.stock - qty;
+                card.stock = newStock;
+
+                const cards = document.querySelectorAll('.card');
+                let targetCard = null;
+                for (let i = 0; i < cards.length; i++) {
+                    const minusBtn = cards[i].querySelector('.minus');
+                    if (minusBtn && parseInt(minusBtn.dataset.index) === idx) {
+                        targetCard = cards[i];
+                        break;
+                    }
+                }
+                if (targetCard) {
+                    const stockSpan = targetCard.querySelector('.stock');
+                    if (stockSpan) stockSpan.textContent = `Остаток: ${newStock} шт`;
+                    if (newStock === 0) targetCard.classList.add('out-of-stock');
+                    else targetCard.classList.remove('out-of-stock');
+                }
+            }
+
+            (async () => {
+                for (const [idxStr, qty] of Object.entries(cartCopy)) {
+                    if (qty === 0) continue;
+                    const idx = parseInt(idxStr);
+                    for (let i = 0; i < qty; i++) {
+                        try {
+                            await fetch(buildApiUrl("update", `&row=${idx}&delta=-1`));
+                        } catch (e) {
+                            console.error(e);
+                        }
+                    }
+                }
+                showUpdateTime();
+            })();
+            showToast(`Продажа на ${Math.max(0, total).toFixed(2)} ₽ завершена!`, true);
+        }
+
+        // ========== СТАТИСТИКА ==========
         function openStatsModal() {
             const modal = document.getElementById('statsModal');
             if (modal) {
@@ -3541,7 +4585,7 @@
                     <div class="detail-section"><div class="detail-title">🏆 Самые популярные типы мерча</div>
                     <table class="detail-table">
                         <thead>
-                            <tr><th>#</th><th>Тип</th><th class="text-right">Продано, шт</th><tr>
+                            <tr><th>#</th><th>Тип</th><th class="text-right">Продано, шт</th></tr>
                         </thead>
                         <tbody>
                             ${topTypesByQty.map(([type, data], idx) => `
@@ -3591,8 +4635,74 @@
             renderStats();
         }
 
-        let cart = {};
+        // ========== ПРАВИЛА ДЛЯ КОРЗИНЫ ==========
+        function checkRulesForCart() {
+            const cartItems = Object.entries(cart);
+            if (cartItems.length === 0) return [];
+            if (!originalCardsData.length) return [];
 
+            const cartInfo = {};
+            let totalPrice = 0;
+            for (const [idxStr, qty] of cartItems) {
+                if (qty === 0) continue;
+                const idx = parseInt(idxStr);
+                const card = originalCardsData[idx];
+                if (card) {
+                    if (!cartInfo[card.name]) cartInfo[card.name] = {
+                        qty: 0,
+                        price: card.price,
+                        type: card.type
+                    };
+                    cartInfo[card.name].qty += qty;
+                    totalPrice += qty * card.price;
+                }
+            }
+
+            const typeQty = {};
+            for (const [name, info] of Object.entries(cartInfo)) {
+                if (info.type) typeQty[info.type] = (typeQty[info.type] || 0) + info.qty;
+            }
+
+            const activeRules = [];
+
+            for (const rule of rulesList) {
+                if (rule.active === false) continue;
+                let isActive = false;
+                let detailText = "";
+                if (rule.type === 'type') {
+                    const qty = typeQty[rule.condition.typeName] || 0;
+                    if (qty >= rule.condition.minQty) {
+                        isActive = true;
+                        detailText = `(в корзине ${qty} шт товаров типа "${rule.condition.typeName}", нужно от ${rule.condition.minQty})`;
+                    }
+                } else if (rule.type === 'product') {
+                    let totalQty = 0;
+                    for (const productName of rule.condition.productNames) {
+                        totalQty += cartInfo[productName]?.qty || 0;
+                    }
+                    if (totalQty >= rule.condition.minQty) {
+                        isActive = true;
+                        detailText = `(в корзине ${totalQty} шт товаров из списка, нужно от ${rule.condition.minQty})`;
+                    }
+                } else if (rule.type === 'price') {
+                    if (totalPrice >= rule.condition.minSum) {
+                        isActive = true;
+                        detailText = `(сумма ${totalPrice} ₽, нужно от ${rule.condition.minSum} ₽)`;
+                    }
+                } else if (rule.type === 'bonus') {
+                    isActive = true;
+                    detailText = "";
+                }
+                if (isActive) activeRules.push({
+                    icon: rule.icon || "✨",
+                    message: rule.message,
+                    condition: detailText
+                });
+            }
+            return activeRules;
+        }
+
+        // ========== ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ==========
         function showToast(message, isSuccess = true) {
             const existingToast = document.querySelector('.toast-notification');
             if (existingToast) existingToast.remove();
@@ -3604,980 +4714,6 @@
                 toast.classList.add('fade-out');
                 setTimeout(() => toast.remove(), 300);
             }, 2000);
-        }
-
-        function updateCartBadges() {
-            document.querySelectorAll('.card').forEach(card => {
-                const minusBtn = card.querySelector('.minus');
-                if (minusBtn) {
-                    const idx = parseInt(minusBtn.dataset.index);
-                    let badge = card.querySelector('.cart-qty-badge');
-                    if (cart.hasOwnProperty(idx) && cart[idx] > 0) {
-                        const qtyInCart = cart[idx];
-                        if (!badge) {
-                            badge = document.createElement('div');
-                            badge.className = 'cart-qty-badge';
-                            card.style.position = 'relative';
-                            card.appendChild(badge);
-                        }
-                        badge.textContent = qtyInCart;
-                        badge.style.background = 'var(--btn-bg)';
-                    } else {
-                        if (badge) badge.remove();
-                    }
-                }
-            });
-        }
-
-        function getBestDiscountForItem(idx, originalPrice, qty, subtotal) {
-            let finalPrice = originalPrice;
-            let discountValue = 0;
-            let discountType = null;
-            if (itemDiscounts[idx]) {
-                const disc = itemDiscounts[idx];
-                discountType = disc.type;
-                if (disc.type === 'percent') {
-                    finalPrice = originalPrice * (1 - disc.value / 100);
-                    discountValue = disc.value;
-                } else if (disc.type === 'fixed') {
-                    const discountPerItem = disc.value;
-                    finalPrice = Math.max(0, originalPrice - discountPerItem);
-                    discountValue = discountPerItem;
-                }
-            }
-            return { price: finalPrice, discountValue: discountValue, discountType: discountType };
-        }
-
-        function updateCartUI() {
-            const totalPositiveCount = Object.values(cart).reduce((a, b) => a + (b > 0 ? b : 0), 0);
-            const cartCountSpan = document.getElementById('cartCount');
-            if (cartCountSpan) cartCountSpan.textContent = totalPositiveCount;
-            const cartItemsDiv = document.getElementById('cart-items-list');
-            const cartTotalDiv = document.getElementById('cart-total');
-            const cartActionsDiv = document.getElementById('cart-actions');
-            const discountPanelDiv = document.getElementById('discount-panel');
-
-            if (!cartItemsDiv) return;
-            const hasAny = Object.keys(cart).length > 0;
-
-            if (discountPanelDiv) {
-                discountPanelDiv.style.display = hasAny ? 'block' : 'none';
-            }
-
-            if (!hasAny) {
-                cartItemsDiv.innerHTML = '<div class="empty-cart">🍌 Корзина пуста</div>';
-                if (cartTotalDiv) cartTotalDiv.style.display = 'none';
-                if (cartActionsDiv) cartActionsDiv.style.display = 'none';
-                updateCartBadges();
-                return;
-            }
-
-            let discountHtml = `
-                <div class="discount-section">
-                    <div class="discount-header" onclick="toggleDiscountPanel()">
-                        <span class="discount-title">🎯 Скидки</span>
-                        <span class="discount-chevron" id="discount-chevron">▼</span>
-                    </div>
-                    <div id="discount-content" class="discount-content" style="display: ${discountPanelOpen ? 'block' : 'none'};">
-                        <div class="discount-group">
-                            <div class="discount-row">
-                                <div class="discount-custom-select">
-                                    <div class="discount-custom-select-trigger" id="itemDiscountSelectTrigger" onclick="event.stopPropagation(); toggleItemDiscountSelect()">%</div>
-                                    <div class="discount-custom-select-dropdown" id="itemDiscountSelectDropdown">
-                                        <div class="discount-select-option" onclick="selectItemDiscountType('percent', '%')">%</div>
-                                        <div class="discount-select-option" onclick="selectItemDiscountType('fixed', '₽')">₽</div>
-                                    </div>
-                                    <input type="hidden" id="itemDiscountTypeSelect" data-value="percent">
-                                </div>
-                                <div class="discount-amount-control">
-                                    <input type="number" id="itemDiscountValue" class="discount-amount-input" placeholder="Сумма" value="0" onchange="updateItemDiscountFromInput()">
-                                    <button class="discount-step-btn" onclick="changeItemDiscountValue(-1)">−</button>
-                                    <button class="discount-step-btn" onclick="changeItemDiscountValue(1)">+</button>
-                                </div>
-                                <button class="discount-products-btn" onclick="toggleDiscountProductsList()">Товары</button>
-                                <button class="discount-all-btn" onclick="selectAllProductsForDiscount()">Всё</button>
-                                <button class="discount-none-btn" onclick="selectNoneProductsForDiscount()">Ничего</button>
-                            </div>
-                            <div id="productDiscountList" style="display: none; margin-top: 8px;"></div>
-                        </div>
-                        <div class="discount-buttons-row">
-                            <button class="discount-action-btn cancel-btn" onclick="closeDiscountPanel()">Отмена</button>
-                            <button class="discount-action-btn reset-btn" onclick="resetItemDiscounts()">Сбросить скидки</button>
-                            <button class="discount-action-btn apply-btn" onclick="applyItemDiscount()">Применить</button>
-                        </div>
-                    </div>
-                </div>
-            `;
-            if (discountPanelDiv) discountPanelDiv.innerHTML = discountHtml;
-
-            const activeRules = checkRulesForCart();
-            let total = 0;
-            let html = '';
-
-            if (activeRules.length > 0) {
-                html += `<div style="background: var(--badge-bg); border-radius: 16px; padding: 12px; margin-bottom: 16px; border-left: 4px solid var(--btn-bg);">
-                            <div style="font-size: 13px; font-weight: bold; margin-bottom: 8px; color: var(--badge-text);">✨ Активные правила ✨</div>`;
-                for (const rule of activeRules) {
-                    html += `<div style="display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text-primary); padding: 4px 0;">
-                                <span style="font-size: 16px;">${escapeHtml(rule.icon)}</span>
-                                <span><span class="rule-text-bold">${escapeHtml(rule.message)}</span> <span class="rule-text-normal">${escapeHtml(rule.condition)}</span></span>
-                            </div>`;
-                }
-                html += `</div>`;
-            }
-
-            let subtotal = 0;
-            for (const [idxStr, qty] of Object.entries(cart)) {
-                const idx = parseInt(idxStr);
-                const card = originalCardsData[idx];
-                if (card) subtotal += qty * card.price;
-            }
-
-            for (const [idxStr, qty] of Object.entries(cart)) {
-                const idx = parseInt(idxStr);
-                const card = originalCardsData[idx];
-                if (!card) continue;
-
-                const best = getBestDiscountForItem(idx, card.price, qty, subtotal);
-                const originalItemTotal = card.price * qty;
-                const discountedItemTotal = best.price * qty;
-                total += discountedItemTotal;
-                const isZero = qty === 0;
-                const hasDiscount = best.discountValue > 0;
-
-                let discountText = '';
-                if (hasDiscount) {
-                    if (best.discountType === 'percent') {
-                        discountText = `<div style="font-size: 11px; color: var(--profit-positive);">Скидка: ${best.discountValue}%</div>`;
-                    } else if (best.discountType === 'fixed') {
-                        discountText = `<div style="font-size: 11px; color: var(--profit-positive);">Скидка: ${best.discountValue * qty} ₽</div>`;
-                    }
-                }
-
-                html += `<div class="cart-item ${isZero ? 'disabled' : ''}">
-                            <div class="cart-item-info">
-                                <div class="cart-item-name">${escapeHtml(card.name)}</div>
-                                <div class="cart-item-price">
-                                    ${card.price} ₽ × ${qty} = 
-                                    ${hasDiscount ? `<span class="strikethrough">${originalItemTotal.toFixed(2)} ₽</span> ${discountedItemTotal.toFixed(2)} ₽` : `${originalItemTotal.toFixed(2)} ₽`}
-                                </div>
-                                ${discountText}
-                            </div>
-                            <div class="cart-item-quantity">
-                                <button class="cart-qty-btn" onclick="changeCartQty(${idx}, -1)" ${isZero ? 'disabled' : ''}>−</button>
-                                <span class="cart-item-qty">${qty}</span>
-                                <button class="cart-qty-btn" onclick="changeCartQty(${idx}, 1)">+</button>
-                                <button class="cart-item-remove" onclick="removeFromCart(${idx})">🗑</button>
-                            </div>
-                        </div>`;
-            }
-            cartItemsDiv.innerHTML = html;
-            if (cartTotalDiv) {
-                cartTotalDiv.style.display = 'block';
-                const hasAnyDiscount = Object.values(itemDiscounts).length > 0;
-                if (hasAnyDiscount) {
-                    let discountTotalInfo = '';
-                    let totalDiscountRub = subtotal - total;
-                    discountTotalInfo = ` (скидка ${totalDiscountRub.toFixed(2)} ₽)`;
-                    cartTotalDiv.innerHTML = `<span class="strikethrough">${subtotal.toFixed(2)} ₽</span> ${Math.max(0, total).toFixed(2)} ₽${discountTotalInfo}`;
-                } else {
-                    cartTotalDiv.innerHTML = `🍌 Итого: ${Math.max(0, total).toFixed(2)} ₽`;
-                }
-            }
-            if (cartActionsDiv && totalPositiveCount > 0) cartActionsDiv.style.display = 'flex';
-            else if (cartActionsDiv) cartActionsDiv.style.display = 'none';
-            updateCartBadges();
-        }
-
-        function addToCart(index) {
-            const card = originalCardsData[index];
-            if (!card) return;
-            if (card.stock <= 0) {
-                showToast(`${card.name} закончился!`, false);
-                return;
-            }
-            const currentQty = cart[index] || 0;
-            if (currentQty + 1 > card.stock) {
-                showToast(`Нельзя добавить больше, чем есть (${card.stock} шт)`, false);
-                return;
-            }
-            cart[index] = currentQty + 1;
-            updateCartUI();
-            showToast(`${card.name} +1`, true);
-        }
-
-        function changeCartQty(index, delta) {
-            const card = originalCardsData[index];
-            if (!card) return;
-            const currentQty = cart[index] || 0;
-            const newQty = currentQty + delta;
-            if (newQty < 0) return;
-            if (newQty > card.stock) {
-                showToast(`Нельзя добавить больше, чем есть (${card.stock} шт)`, false);
-                return;
-            }
-            if (newQty === 0) delete cart[index];
-            else cart[index] = newQty;
-            updateCartUI();
-        }
-
-        function removeFromCart(index) {
-            delete cart[index];
-            updateCartUI();
-            const card = originalCardsData[index];
-            if (card) showToast(`${card.name} удалён из корзины`, true);
-        }
-
-        function clearCart() {
-            cart = {};
-            itemDiscounts = {};
-            selectedDiscountProducts.clear();
-            updateCartUI();
-            showToast(`Корзина очищена`, true);
-        }
-
-        function giftCart() {
-            const items = Object.entries(cart).filter(([_, qty]) => qty > 0);
-            if (items.length === 0) {
-                showToast("Нет товаров для подарка", false);
-                return;
-            }
-
-            for (const [idxStr, qty] of items) {
-                const idx = parseInt(idxStr);
-                const card = originalCardsData[idx];
-                if (qty > card.stock) {
-                    showToast(`Не хватает "${card.name}" (нужно ${qty}, есть ${card.stock})`, false);
-                    return;
-                }
-            }
-
-            const historyItems = items.map(([idxStr, qty]) => {
-                const idx = parseInt(idxStr);
-                const card = originalCardsData[idx];
-                return {
-                    name: card.name,
-                    qty: qty,
-                    price: 0
-                };
-            });
-            addToHistory(historyItems, 0, 'gift', false);
-
-            const cartCopy = { ...cart };
-            closeCartModal();
-            cart = {};
-            itemDiscounts = {};
-            selectedDiscountProducts.clear();
-            updateCartUI();
-
-            for (const [idxStr, qty] of Object.entries(cartCopy)) {
-                if (qty === 0) continue;
-                const idx = parseInt(idxStr);
-                const card = originalCardsData[idx];
-                const newStock = card.stock - qty;
-                card.stock = newStock;
-
-                const cards = document.querySelectorAll('.card');
-                let targetCard = null;
-                for (let i = 0; i < cards.length; i++) {
-                    const minusBtn = cards[i].querySelector('.minus');
-                    if (minusBtn && parseInt(minusBtn.dataset.index) === idx) {
-                        targetCard = cards[i];
-                        break;
-                    }
-                }
-                if (targetCard) {
-                    const stockSpan = targetCard.querySelector('.stock');
-                    if (stockSpan) stockSpan.textContent = `Остаток: ${newStock} шт`;
-                    if (newStock === 0) targetCard.classList.add('out-of-stock');
-                    else targetCard.classList.remove('out-of-stock');
-                }
-            }
-
-            (async () => {
-                for (const [idxStr, qty] of Object.entries(cartCopy)) {
-                    if (qty === 0) continue;
-                    const idx = parseInt(idxStr);
-                    for (let i = 0; i < qty; i++) {
-                        try {
-                            await fetch(buildApiUrl("update", `&row=${idx}&delta=-1`));
-                        } catch (e) {
-                            console.error(e);
-                        }
-                    }
-                }
-                showUpdateTime();
-            })();
-            showToast(`Подарок оформлен!`, true);
-        }
-
-        function openCartModal() {
-            const modal = document.getElementById('cartModal');
-            if (modal) {
-                modal.style.display = 'block';
-                discountPanelOpen = false;
-            }
-            updateCartUI();
-        }
-
-        function closeCartModal() {
-            const modal = document.getElementById('cartModal');
-            if (modal) modal.style.display = 'none';
-        }
-
-        async function updateStock(index, delta, silent = false) {
-            const card = originalCardsData[index];
-            if (!card) return;
-            const newStock = card.stock + delta;
-            if (newStock < 0) {
-                if (!silent) showToast("Остаток не может быть меньше 0", false);
-                return;
-            }
-            card.stock = newStock;
-            filterAndSort();
-            try {
-                const response = await fetch(buildApiUrl("update", `&row=${index}&delta=${delta}`));
-                const result = await response.json();
-                if (!result.success && !silent) {
-                    await loadData(true, true);
-                    showToast("Ошибка: " + (result.error || "неизвестная"), false);
-                }
-            } catch (error) {
-                console.error(error);
-                if (!silent) {
-                    await loadData(true, true);
-                    showToast("Ошибка соединения", false);
-                }
-            }
-            updateCartBadges();
-            if (!silent) {
-                if (delta === -1) {
-                    addSingleSaleToHistory(card.name, 1, card.price, false);
-                    showToast(`Продажа: ${card.name} -1 шт`, true);
-                } else if (delta === 1) {
-                    addSingleSaleToHistory(card.name, 1, card.price, true);
-                    showToast(`Возврат: ${card.name} +1 шт`, true);
-                }
-            }
-        }
-
-        async function checkout() {
-            const items = Object.entries(cart).filter(([_, qty]) => qty > 0);
-            if (items.length === 0) {
-                showToast("Нет товаров для продажи", false);
-                return;
-            }
-
-            let subtotal = 0;
-            for (const [idxStr, qty] of items) {
-                const idx = parseInt(idxStr);
-                const card = originalCardsData[idx];
-                subtotal += qty * card.price;
-            }
-
-            let total = 0;
-            for (const [idxStr, qty] of items) {
-                const idx = parseInt(idxStr);
-                const card = originalCardsData[idx];
-                const best = getBestDiscountForItem(idx, card.price, qty, subtotal);
-                total += best.price * qty;
-            }
-
-            for (const [idxStr, qty] of items) {
-                const idx = parseInt(idxStr);
-                const card = originalCardsData[idx];
-                if (qty > card.stock) {
-                    showToast(`Не хватает "${card.name}" (нужно ${qty}, есть ${card.stock})`, false);
-                    return;
-                }
-            }
-
-            const activeRules = checkRulesForCart();
-            if (activeRules.length > 0) {
-                let rulesMessage = "Не забудьте:\n";
-                for (const rule of activeRules) rulesMessage += `• ${rule.message}\n`;
-                showToast(rulesMessage, true);
-            }
-
-            const historyItems = items.map(([idxStr, qty]) => {
-                const idx = parseInt(idxStr);
-                const card = originalCardsData[idx];
-                return {
-                    name: card.name,
-                    qty: qty,
-                    price: card.price
-                };
-            });
-            addToHistory(historyItems, total, 'basket', false);
-
-            const cartCopy = { ...cart };
-            closeCartModal();
-            cart = {};
-            itemDiscounts = {};
-            selectedDiscountProducts.clear();
-            updateCartUI();
-
-            for (const [idxStr, qty] of Object.entries(cartCopy)) {
-                if (qty === 0) continue;
-                const idx = parseInt(idxStr);
-                const card = originalCardsData[idx];
-                const newStock = card.stock - qty;
-                card.stock = newStock;
-
-                const cards = document.querySelectorAll('.card');
-                let targetCard = null;
-                for (let i = 0; i < cards.length; i++) {
-                    const minusBtn = cards[i].querySelector('.minus');
-                    if (minusBtn && parseInt(minusBtn.dataset.index) === idx) {
-                        targetCard = cards[i];
-                        break;
-                    }
-                }
-                if (targetCard) {
-                    const stockSpan = targetCard.querySelector('.stock');
-                    if (stockSpan) stockSpan.textContent = `Остаток: ${newStock} шт`;
-                    if (newStock === 0) targetCard.classList.add('out-of-stock');
-                    else targetCard.classList.remove('out-of-stock');
-                }
-            }
-
-            (async () => {
-                for (const [idxStr, qty] of Object.entries(cartCopy)) {
-                    if (qty === 0) continue;
-                    const idx = parseInt(idxStr);
-                    for (let i = 0; i < qty; i++) {
-                        try {
-                            await fetch(buildApiUrl("update", `&row=${idx}&delta=-1`));
-                        } catch (e) {
-                            console.error(e);
-                        }
-                    }
-                }
-                showUpdateTime();
-            })();
-            showToast(`Продажа на ${Math.max(0, total).toFixed(2)} ₽ завершена!`, true);
-        }
-
-        let tempSelectedTypes = new Set();
-
-        function updateTypeFilterTrigger() {
-            const trigger = document.getElementById('typeFilterTrigger');
-            if (!trigger) return;
-            if (selectedTypes.size === 0) trigger.textContent = 'Все типы мерча';
-            else if (selectedTypes.size === 1) trigger.textContent = Array.from(selectedTypes)[0];
-            else trigger.textContent = `Выбрано: ${selectedTypes.size}`;
-        }
-
-        function buildTypeMultiSelect() {
-            const dropdown = document.getElementById('typeFilterDropdown');
-            if (!dropdown) return;
-            tempSelectedTypes = new Set(selectedTypes);
-            let html = '<div class="type-select-list"><div class="filter-option-header">Выберите типы мерча</div>';
-            typeOptions.forEach(type => {
-                const isSelected = tempSelectedTypes.has(type);
-                html += `<div class="type-select-item ${isSelected ? 'selected' : ''}" data-type="${escapeHtml(type)}">
-                            <span>${escapeHtml(type)}</span>
-                            ${isSelected ? '<span class="type-select-check">✓</span>' : ''}
-                        </div>`;
-            });
-            html += '</div><div class="filter-buttons"><button class="filter-reset-btn" id="typeResetBtn">Сбросить</button><button class="filter-apply-btn" id="typeApplyBtn">Применить</button></div>';
-            dropdown.innerHTML = html;
-            document.querySelectorAll('.type-select-item').forEach(item => {
-                item.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    const type = item.dataset.type;
-                    if (tempSelectedTypes.has(type)) tempSelectedTypes.delete(type);
-                    else tempSelectedTypes.add(type);
-                    const items = document.querySelectorAll('.type-select-item');
-                    items.forEach(it => {
-                        if (it.dataset.type === type) {
-                            if (tempSelectedTypes.has(type)) {
-                                it.classList.add('selected');
-                                if (!it.querySelector('.type-select-check')) it.innerHTML += '<span class="type-select-check">✓</span>';
-                            } else {
-                                it.classList.remove('selected');
-                                const checkSpan = it.querySelector('.type-select-check');
-                                if (checkSpan) checkSpan.remove();
-                            }
-                        }
-                    });
-                });
-            });
-            const resetBtn = document.getElementById('typeResetBtn');
-            const applyBtn = document.getElementById('typeApplyBtn');
-            if (resetBtn) {
-                resetBtn.onclick = (e) => {
-                    e.stopPropagation();
-                    tempSelectedTypes.clear();
-                    const items = document.querySelectorAll('.type-select-item');
-                    items.forEach(item => {
-                        item.classList.remove('selected');
-                        const checkSpan = item.querySelector('.type-select-check');
-                        if (checkSpan) checkSpan.remove();
-                    });
-                };
-            }
-            if (applyBtn) {
-                applyBtn.onclick = (e) => {
-                    e.stopPropagation();
-                    selectedTypes = new Set(tempSelectedTypes);
-                    updateTypeFilterTrigger();
-                    document.getElementById('typeFilterDropdown').classList.remove('show');
-                    filterAndSort();
-                };
-            }
-        }
-
-        function sortByRevenue(data) {
-            const revenueMap = new Map();
-            const sales = salesHistory.filter(entry => !entry.isReturn);
-            for (const sale of sales) {
-                for (const item of sale.items) {
-                    const currentRevenue = revenueMap.get(item.name) || 0;
-                    revenueMap.set(item.name, currentRevenue + (item.qty * item.price));
-                }
-            }
-            return [...data].sort((a, b) => {
-                const revenueA = revenueMap.get(a.name) || 0;
-                const revenueB = revenueMap.get(b.name) || 0;
-                const isOutOfStockA = (a.stock || 0) === 0;
-                const isOutOfStockB = (b.stock || 0) === 0;
-                if (isOutOfStockA && !isOutOfStockB) return 1;
-                if (!isOutOfStockA && isOutOfStockB) return -1;
-                return revenueB - revenueA;
-            });
-        }
-
-        function saveCustomOrder() {
-            const order = [];
-            document.querySelectorAll('#cards-container .card').forEach(card => {
-                const name = card.querySelector('.name')?.textContent;
-                if (name) {
-                    const originalCard = originalCardsData.find(c => c.name === name);
-                    if (originalCard) {
-                        order.push(originalCardsData.findIndex(c => c.name === name));
-                    }
-                }
-            });
-            if (order.length === originalCardsData.length) {
-                customOrder = order;
-                localStorage.setItem('merch_custom_order', JSON.stringify(customOrder));
-                syncCustomOrderToServer();
-            }
-        }
-
-        async function syncCustomOrderToServer() {
-            try {
-                const data = encodeURIComponent(JSON.stringify(customOrder));
-                await fetch(buildApiUrl("syncCustomOrder", `&data=${data}`));
-            } catch (e) {
-                console.error(e);
-            }
-        }
-
-        async function loadCustomOrderFromServer() {
-            try {
-                const response = await fetch(buildApiUrl("getCustomOrder"));
-                const data = await response.json();
-                if (data && data.order && Array.isArray(data.order)) {
-                    customOrder = data.order;
-                    localStorage.setItem('merch_custom_order', JSON.stringify(customOrder));
-                    return true;
-                }
-                return false;
-            } catch (e) {
-                return false;
-            }
-        }
-
-        function loadCustomOrder() {
-            const saved = localStorage.getItem('merch_custom_order');
-            if (saved) {
-                try {
-                    customOrder = JSON.parse(saved);
-                } catch (e) {
-                    customOrder = [];
-                }
-            } else {
-                customOrder = [];
-            }
-        }
-
-        async function initCustomOrder() {
-            const loaded = await loadCustomOrderFromServer();
-            if (!loaded) {
-                loadCustomOrder();
-            }
-        }
-
-        function applyCustomOrder(data) {
-            if (!customOrder.length || customOrder.length !== data.length) {
-                return data;
-            }
-            const ordered = [];
-            for (const idx of customOrder) {
-                if (data[idx]) ordered.push(data[idx]);
-            }
-            for (const item of data) {
-                if (!ordered.includes(item)) ordered.push(item);
-            }
-            return ordered;
-        }
-
-        function dragStartHandler(e, index) {
-            dragStartIndex = index;
-            e.target.closest('.card')?.classList.add('dragging');
-        }
-
-        function dragEndHandler(e) {
-            e.target.closest('.card')?.classList.remove('dragging');
-            dragStartIndex = null;
-        }
-
-        function dragOverHandler(e) {
-            e.preventDefault();
-            const card = e.target.closest('.card');
-            if (card) card.classList.add('drag-over');
-        }
-
-        function dragLeaveHandler(e) {
-            const card = e.target.closest('.card');
-            if (card) card.classList.remove('drag-over');
-        }
-
-        function dropHandler(e, dropIndex) {
-            e.preventDefault();
-            const card = e.target.closest('.card');
-            if (card) card.classList.remove('drag-over');
-
-            if (dragStartIndex !== null && dragStartIndex !== dropIndex && currentSortBy === 'custom') {
-                const cards = [...currentFilteredData];
-                const [movedCard] = cards.splice(dragStartIndex, 1);
-                cards.splice(dropIndex, 0, movedCard);
-                currentFilteredData = cards;
-                renderCards();
-
-                const newOrder = [];
-                currentFilteredData.forEach(card => {
-                    const originalIndex = originalCardsData.findIndex(orig => orig.name === card.name && orig.type === card.type);
-                    if (originalIndex !== -1) newOrder.push(originalIndex);
-                });
-                customOrder = newOrder;
-                localStorage.setItem('merch_custom_order', JSON.stringify(customOrder));
-                syncCustomOrderToServer();
-            }
-            dragStartIndex = null;
-        }
-
-        function filterAndSort() {
-            let filtered = [...originalCardsData];
-
-            const searchText = document.getElementById('searchInput')?.value.toLowerCase() || '';
-            if (searchText) {
-                filtered = filtered.filter(card => card.name.toLowerCase().includes(searchText));
-            }
-
-            if (selectedTypes.size > 0) {
-                filtered = filtered.filter(card => selectedTypes.has(card.type));
-            }
-
-            if (currentSortBy !== 'none') {
-                switch (currentSortBy) {
-                    case 'name':
-                        filtered.sort((a, b) => a.name.localeCompare(b.name));
-                        break;
-                    case 'stock':
-                        filtered.sort((a, b) => (a.stock || 0) - (b.stock || 0));
-                        break;
-                    case 'stockDesc':
-                        filtered.sort((a, b) => (b.stock || 0) - (a.stock || 0));
-                        break;
-                    case 'priceAsc':
-                        filtered.sort((a, b) => (a.price || 0) - (b.price || 0));
-                        break;
-                    case 'priceDesc':
-                        filtered.sort((a, b) => (b.price || 0) - (a.price || 0));
-                        break;
-                    case 'type':
-                        filtered.sort((a, b) => (a.type || '').localeCompare(b.type || ''));
-                        break;
-                    case 'relevance':
-                        filtered = sortByRevenue(filtered);
-                        break;
-                    case 'custom':
-                        filtered = applyCustomOrder(filtered);
-                        break;
-                }
-            }
-
-            currentFilteredData = filtered;
-            renderCards();
-        }
-
-        function renderCards() {
-            const container = document.getElementById('cards-container');
-            if (!container) return;
-            container.innerHTML = '';
-
-            if (currentFilteredData.length === 0) {
-                container.innerHTML = '<div class="loading">🍌 Ни одного бананчика не найдено 🍌</div>';
-                return;
-            }
-
-            currentFilteredData.forEach((card, displayIndex) => {
-                const originalIndex = originalCardsData.findIndex(orig => orig.name === card.name && orig.type === card.type);
-                const type = card.type || "";
-                const name = card.name || "Без названия";
-                const total = typeof card.total === 'number' ? card.total : 0;
-                const stock = typeof card.stock === 'number' ? card.stock : 0;
-                const price = typeof card.price === 'number' ? card.price : 0;
-                const isOutOfStock = stock === 0;
-                const typeColor = type ? getTypeColor(type) : '#c25d1a';
-
-                const cardDiv = document.createElement('div');
-                cardDiv.className = `card ${isOutOfStock ? 'out-of-stock' : ''}`;
-                cardDiv.style.position = 'relative';
-                cardDiv.setAttribute('draggable', currentSortBy === 'custom');
-                cardDiv.setAttribute('data-index', displayIndex);
-
-                if (currentSortBy === 'custom') {
-                    cardDiv.addEventListener('dragstart', (e) => dragStartHandler(e, displayIndex));
-                    cardDiv.addEventListener('dragend', dragEndHandler);
-                    cardDiv.addEventListener('dragover', dragOverHandler);
-                    cardDiv.addEventListener('dragleave', dragLeaveHandler);
-                    cardDiv.addEventListener('drop', (e) => dropHandler(e, displayIndex));
-                }
-
-                cardDiv.innerHTML = `
-                    <div class="info">
-                        <div class="title-row">
-                            ${type ? `<span class="type-badge" style="background: ${typeColor}20; color: ${typeColor}; border: 1px solid ${typeColor}40;">${escapeHtml(type)}</span>` : ''}
-                            ${currentSortBy === 'custom' ? '<span class="sort-handle">⋮⋮</span>' : ''}
-                            <span class="name">${escapeHtml(name)}</span>
-                        </div>
-                        <div class="stock-row">
-                            <span class="stock">Остаток: ${stock} шт</span>
-                        </div>
-                        <div class="total-row">
-                            <span class="total">📦 Всего: ${total} шт</span>
-                            <button class="edit-icon" onclick="openEditProductModal(${originalIndex})">✏️</button>
-                        </div>
-                        <div class="price-row">
-                            <span class="price">💰 Цена: ${price} ₽</span>
-                        </div>
-                    </div>
-                    <div class="buttons">
-                        <button class="minus" data-index="${originalIndex}" data-delta="-1">−1</button>
-                        <button class="plus" data-index="${originalIndex}" data-delta="+1">+1</button>
-                        <button class="add-to-cart" data-index="${originalIndex}">➕</button>
-                    </div>
-                `;
-                container.appendChild(cardDiv);
-            });
-
-            document.querySelectorAll('.minus, .plus').forEach(btn => {
-                btn.removeEventListener('click', handleButtonClick);
-                btn.addEventListener('click', handleButtonClick);
-            });
-            document.querySelectorAll('.add-to-cart').forEach(btn => {
-                btn.removeEventListener('click', handleAddToCart);
-                btn.addEventListener('click', handleAddToCart);
-            });
-            updateCartBadges();
-        }
-
-        function handleAddToCart(e) {
-            const btn = e.currentTarget;
-            const index = parseInt(btn.dataset.index);
-            addToCart(index);
-        }
-
-        async function handleButtonClick(e) {
-            const btn = e.currentTarget;
-            const index = parseInt(btn.dataset.index);
-            const delta = parseInt(btn.dataset.delta);
-            await updateStock(index, delta);
-        }
-
-        function initSortSelect() {
-            const sortTrigger = document.getElementById('sortByTrigger');
-            const sortDropdown = document.getElementById('sortByDropdown');
-
-            const sortOptions = [
-                { value: "none", label: "Без сортировки" },
-                { value: "relevance", label: "По выручке" },
-                { value: "name", label: "По названию" },
-                { value: "stock", label: "По остатку: сначала мало" },
-                { value: "stockDesc", label: "По остатку: сначала много" },
-                { value: "priceAsc", label: "По цене: сначала дешёвое" },
-                { value: "priceDesc", label: "По цене: сначала дорогое" },
-                { value: "type", label: "По типу" },
-                { value: "custom", label: "Пользовательская" }
-            ];
-
-            function buildSortDropdown() {
-                sortDropdown.innerHTML = '';
-                const header = document.createElement('div');
-                header.className = 'filter-option-header';
-                header.textContent = 'Выберите сортировку';
-                sortDropdown.appendChild(header);
-
-                sortOptions.forEach(opt => {
-                    const div = document.createElement('div');
-                    div.className = 'sort-option';
-                    if (currentSortBy === opt.value) div.classList.add('active');
-                    div.textContent = opt.label;
-                    div.onclick = (e) => {
-                        e.stopPropagation();
-                        document.querySelectorAll('.sort-option').forEach(optDiv => optDiv.classList.remove('active'));
-                        div.classList.add('active');
-                        currentSortBy = opt.value;
-                        sortTrigger.textContent = opt.label;
-
-                        if (currentSortBy === 'custom') {
-                            initCustomOrder().then(() => filterAndSort());
-                        } else {
-                            filterAndSort();
-                        }
-                        sortDropdown.classList.remove('show');
-                    };
-                    sortDropdown.appendChild(div);
-                });
-            }
-
-            function closeSortDropdown() {
-                sortDropdown.classList.remove('show');
-            }
-
-            sortTrigger.onclick = (e) => {
-                e.stopPropagation();
-                sortDropdown.classList.toggle('show');
-            };
-            document.addEventListener('click', () => closeSortDropdown());
-            buildSortDropdown();
-        }
-
-        function initCustomSelects() {
-            initSortSelect();
-
-            const typeTrigger = document.getElementById('typeFilterTrigger');
-            const typeDropdown = document.getElementById('typeFilterDropdown');
-
-            function closeTypeDropdown() {
-                typeDropdown.classList.remove('show');
-            }
-
-            typeTrigger.onclick = (e) => {
-                e.stopPropagation();
-                typeDropdown.classList.toggle('show');
-                buildTypeMultiSelect();
-            };
-
-            document.addEventListener('click', (e) => {
-                if (!typeTrigger.contains(e.target) && !typeDropdown.contains(e.target)) {
-                    closeTypeDropdown();
-                }
-            });
-        }
-
-        function updateTypeOptions() {
-            const types = new Set();
-            originalCardsData.forEach(card => {
-                if (card.type && card.type.trim()) types.add(card.type);
-            });
-            typeOptions = Array.from(types).sort();
-            selectedTypes.forEach(type => {
-                if (!typeOptions.includes(type)) selectedTypes.delete(type);
-            });
-            updateTypeFilterTrigger();
-        }
-
-        function showUpdateTime() {
-            const now = new Date();
-            const timeStr = now.toLocaleTimeString('ru-RU', {
-                hour: '2-digit',
-                minute: '2-digit',
-                second: '2-digit'
-            });
-            const timeElement = document.getElementById('update-time');
-            if (timeElement) timeElement.innerText = `Обновлено: ${timeStr} 🍌`;
-        }
-
-        function showProgressBar() {
-            const container = document.getElementById('progressContainer');
-            const bar = document.getElementById('progressBar');
-            if (container && bar) {
-                container.style.display = 'block';
-                container.classList.add('active');
-                bar.style.width = '0%';
-                setTimeout(() => {
-                    if (bar) bar.style.width = '90%';
-                }, 50);
-            }
-        }
-
-        function hideProgressBar() {
-            const container = document.getElementById('progressContainer');
-            const bar = document.getElementById('progressBar');
-            if (container && bar) {
-                bar.style.width = '100%';
-                setTimeout(() => {
-                    container.style.display = 'none';
-                    container.classList.remove('active');
-                    bar.style.width = '0%';
-                }, 300);
-            }
-        }
-
-        async function loadData(showLoading = true, showProgress = false) {
-            if (isLoading) return;
-            isLoading = true;
-            const isAutoRefresh = showProgress && !showLoading;
-
-            if (!isAutoRefresh) {
-                const autoRefreshBadge = document.querySelector('.auto-refresh-badge');
-                if (autoRefreshBadge) {
-                    autoRefreshBadge.style.opacity = '0';
-                    autoRefreshBadge.style.visibility = 'hidden';
-                }
-                if (showProgress) showProgressBar();
-                if (showLoading) {
-                    const container = document.getElementById('cards-container');
-                    if (container) container.innerHTML = '<div class="loading">Загрузка бананчиков...</div>';
-                }
-            }
-
-            try {
-                const response = await fetch(buildApiUrl("get"));
-                const data = await response.json();
-
-                if (data && data.length > 0) {
-                    originalCardsData = data;
-                    updateTypeOptions();
-                    filterAndSort();
-                    showUpdateTime();
-                    updateCartUI();
-                } else if (showLoading && !isAutoRefresh) {
-                    const container = document.getElementById('cards-container');
-                    if (container) container.innerHTML = '<div class="loading">Нет данных. Проверьте таблицу и лист "Мерч". 🍌</div>';
-                }
-            } catch (error) {
-                console.error(error);
-                if (showLoading && !isAutoRefresh) {
-                    const container = document.getElementById('cards-container');
-                    if (container) container.innerHTML = '<div class="loading">Ошибка загрузки. Проверьте интернет и ссылку. 🍌</div>';
-                }
-            } finally {
-                isLoading = false;
-                if (!isAutoRefresh) {
-                    if (showProgress) hideProgressBar();
-                    const autoRefreshBadge = document.querySelector('.auto-refresh-badge');
-                    if (autoRefreshBadge) {
-                        autoRefreshBadge.style.opacity = '';
-                        autoRefreshBadge.style.visibility = '';
-                    }
-                }
-            }
         }
 
         function showHistory() {
@@ -4663,6 +4799,20 @@
             filterAndSort();
         }
 
+        function initApp() {
+            initCustomSelects();
+            loadRules();
+            loadHistory();
+            loadExtraCosts();
+            initDateTimeSelects();
+            bindDateTimeEvents();
+            initCustomOrder();
+            loadData(true, true);
+            startAutoRefresh();
+            startHistoryAutoSync();
+        }
+
+        // ========== ОБРАБОТЧИКИ СОБЫТИЙ ==========
         document.addEventListener('click', function(event) {
             if (!event.target.closest('.rule-custom-select')) {
                 closeAllRuleSelects();
