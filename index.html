@@ -1413,7 +1413,7 @@
             color: var(--minus-color);
             width: auto;
             padding: 12px;
-            font-size: 14px;
+            font-size: 20px;
             border-radius: 30px;
             border: 1px solid var(--border-color);
             cursor: pointer;
@@ -1527,6 +1527,7 @@
         .extra-cost-name {
             flex: 2;
             font-size: 13px;
+            font-weight: bold;
             color: var(--extra-costs-text-light);
         }
 
@@ -1712,13 +1713,6 @@
             margin-bottom: 10px;
         }
 
-        .discount-group-title {
-            font-size: 11px;
-            font-weight: bold;
-            color: var(--badge-text);
-            margin-bottom: 5px;
-        }
-
         .discount-row {
             display: flex;
             align-items: center;
@@ -1784,11 +1778,10 @@
             display: flex;
             align-items: center;
             gap: 4px;
-            flex: 1;
         }
 
         .discount-amount-input {
-            flex: 1;
+            width: 80px;
             padding: 5px 8px;
             border: 1px solid var(--border-color);
             border-radius: 30px;
@@ -1796,7 +1789,6 @@
             color: var(--text-primary);
             font-size: 12px;
             text-align: center;
-            min-width: 70px;
         }
 
         .discount-step-btn {
@@ -1831,7 +1823,7 @@
             padding: 5px 8px;
             font-size: 11px;
             cursor: pointer;
-            color: var(--text-primary);
+            color: #5a3a1a;
             text-align: center;
             transition: all 0.2s;
             height: 30px;
@@ -1844,11 +1836,6 @@
             background: var(--badge-bg);
         }
 
-        .discount-action-btn.apply-btn {
-            flex: 1;
-            max-width: 90px;
-        }
-
         .discount-action-btn.cancel-btn {
             flex: 1;
             max-width: 90px;
@@ -1858,6 +1845,11 @@
             flex: 2;
         }
 
+        .discount-action-btn.apply-btn {
+            flex: 1;
+            max-width: 90px;
+        }
+
         .discount-products-btn {
             background: var(--card-bg);
             border: 1px solid var(--border-color);
@@ -1865,7 +1857,7 @@
             padding: 5px 16px;
             font-size: 11px;
             cursor: pointer;
-            color: var(--text-primary);
+            color: #5a3a1a;
             text-align: center;
             white-space: nowrap;
             height: 30px;
@@ -1885,7 +1877,7 @@
             padding: 5px 12px;
             font-size: 11px;
             cursor: pointer;
-            color: var(--text-primary);
+            color: #5a3a1a;
             text-align: center;
             white-space: nowrap;
             height: 30px;
@@ -1986,7 +1978,6 @@
             flex: 1;
         }
 
-        /* Стили для сортировки перетаскиванием */
         .sort-handle {
             cursor: grab;
             margin-right: 8px;
@@ -1996,6 +1987,13 @@
 
         .sort-handle:active {
             cursor: grabbing;
+        }
+
+        .strikethrough {
+            text-decoration: line-through;
+            color: var(--text-muted);
+            margin-right: 6px;
+            font-size: 11px;
         }
 
         @media (min-width: 1024px) {
@@ -2150,7 +2148,6 @@
         body.dark .extra-cost-name,
         body.dark .extra-cost-amount,
         body.dark .discount-title,
-        body.dark .discount-group-title,
         body.dark .discount-custom-select-trigger,
         body.dark .discount-select-option,
         body.dark .cart-item-name,
@@ -2250,7 +2247,7 @@
             </div>
             <div id="cart-total" class="cart-total" style="display:none;">Итого: 0 ₽</div>
             <div class="cart-actions" id="cart-actions" style="display:none;">
-                <button class="cart-gift" onclick="giftCart()">🎁 Подарить</button>
+                <button class="cart-gift" onclick="giftCart()">🎁</button>
                 <button class="cart-clear" onclick="clearCart()">Очистить</button>
                 <button class="cart-checkout" onclick="checkout()">✅ Продать всё</button>
             </div>
@@ -2569,6 +2566,28 @@
             }
             renderProductDiscountList();
             showToast(`Выбрано ${selectedDiscountProducts.size} товаров`, true);
+        }
+
+        // Изменение значения скидки с учётом типа (кнопки - и +)
+        function changeItemDiscountValue(delta) {
+            const input = document.getElementById('itemDiscountValue');
+            if (input) {
+                let val = parseFloat(input.value) || 0;
+                const typeSelect = document.getElementById('itemDiscountTypeSelect');
+                const type = typeSelect ? typeSelect.getAttribute('data-value') || 'percent' : 'percent';
+                let step = (type === 'percent') ? 1 : 100;
+                val = Math.max(0, val + delta * step);
+                input.value = val;
+            }
+        }
+
+        function updateItemDiscountFromInput() {
+            const input = document.getElementById('itemDiscountValue');
+            if (input) {
+                let val = parseFloat(input.value) || 0;
+                if (val < 0) val = 0;
+                input.value = val;
+            }
         }
 
         // Применение скидки на выбранные товары
@@ -3696,7 +3715,6 @@
                     </div>
                     <div id="discount-content" class="discount-content" style="display: none;">
                         <div class="discount-group">
-                            <div class="discount-group-title">Скидка на отдельные товары</div>
                             <div class="discount-row">
                                 <div class="discount-custom-select">
                                     <div class="discount-custom-select-trigger" id="itemDiscountSelectTrigger" onclick="event.stopPropagation(); toggleItemDiscountSelect()">%</div>
@@ -3706,7 +3724,11 @@
                                     </div>
                                     <input type="hidden" id="itemDiscountTypeSelect" data-value="percent">
                                 </div>
-                                <input type="number" id="itemDiscountValue" class="discount-amount-input" placeholder="Сумма" value="0" step="100">
+                                <div class="discount-amount-control">
+                                    <input type="number" id="itemDiscountValue" class="discount-amount-input" placeholder="Сумма" value="0" onchange="updateItemDiscountFromInput()">
+                                    <button class="discount-step-btn" onclick="changeItemDiscountValue(-1)">−</button>
+                                    <button class="discount-step-btn" onclick="changeItemDiscountValue(1)">+</button>
+                                </div>
                                 <button class="discount-products-btn" onclick="toggleDiscountProductsList()">Товары</button>
                                 <button class="discount-all-btn" onclick="selectAllProductsForDiscount()">Всё</button>
                             </div>
@@ -3752,15 +3774,20 @@
                 if (!card) continue;
 
                 const best = getBestDiscountForItem(idx, card.price, qty, subtotal);
-                const itemTotal = best.price * qty;
-                total += itemTotal;
+                const originalItemTotal = card.price * qty;
+                const discountedItemTotal = best.price * qty;
+                total += discountedItemTotal;
                 const isZero = qty === 0;
+                const hasDiscount = best.discountPercent > 0;
 
                 html += `<div class="cart-item ${isZero ? 'disabled' : ''}">
                             <div class="cart-item-info">
                                 <div class="cart-item-name">${escapeHtml(card.name)}</div>
-                                <div class="cart-item-price">${card.price} ₽ × ${qty} = ${itemTotal.toFixed(2)} ₽</div>
-                                ${best.discountPercent > 0 ? `<div style="font-size: 11px; color: var(--profit-positive);">Скидка: ${best.discountPercent}%</div>` : ''}
+                                <div class="cart-item-price">
+                                    ${hasDiscount ? `<span class="strikethrough">${originalItemTotal.toFixed(2)} ₽</span>` : ''}
+                                    ${discountedItemTotal.toFixed(2)} ₽
+                                </div>
+                                ${hasDiscount ? `<div style="font-size: 11px; color: var(--profit-positive);">Скидка: ${best.discountPercent}%</div>` : ''}
                             </div>
                             <div class="cart-item-quantity">
                                 <button class="cart-qty-btn" onclick="changeCartQty(${idx}, -1)" ${isZero ? 'disabled' : ''}>−</button>
@@ -3773,7 +3800,12 @@
             cartItemsDiv.innerHTML = html;
             if (cartTotalDiv) {
                 cartTotalDiv.style.display = 'block';
-                cartTotalDiv.innerHTML = `🍌 Итого: ${Math.max(0, total).toFixed(2)} ₽`;
+                const hasAnyDiscount = Object.values(itemDiscounts).length > 0;
+                if (hasAnyDiscount) {
+                    cartTotalDiv.innerHTML = `<span class="strikethrough">${subtotal.toFixed(2)} ₽</span> ${Math.max(0, total).toFixed(2)} ₽`;
+                } else {
+                    cartTotalDiv.innerHTML = `🍌 Итого: ${Math.max(0, total).toFixed(2)} ₽`;
+                }
             }
             if (cartActionsDiv && totalPositiveCount > 0) cartActionsDiv.style.display = 'flex';
             else if (cartActionsDiv) cartActionsDiv.style.display = 'none';
@@ -4125,25 +4157,35 @@
             }
         }
 
-        function toggleTempTypeSelection(type) {
-            if (tempSelectedTypes.has(type)) tempSelectedTypes.delete(type);
-            else tempSelectedTypes.add(type);
-            const items = document.querySelectorAll('.type-select-item');
-            items.forEach(item => {
-                if (item.dataset.type === type) {
-                    if (tempSelectedTypes.has(type)) {
-                        item.classList.add('selected');
-                        if (!item.querySelector('.type-select-check')) item.innerHTML += '<span class="type-select-check">✓</span>';
-                    } else {
-                        item.classList.remove('selected');
-                        const checkSpan = item.querySelector('.type-select-check');
-                        if (checkSpan) checkSpan.remove();
-                    }
+        // ========== СОРТИРОВКА ==========
+        // Функция сортировки по релевантности (наибольшая выручка)
+        function sortByRevenue(data) {
+            // Сначала собираем данные о выручке по товарам из истории продаж
+            const revenueMap = new Map();
+            const sales = salesHistory.filter(entry => !entry.isReturn);
+            for (const sale of sales) {
+                for (const item of sale.items) {
+                    const currentRevenue = revenueMap.get(item.name) || 0;
+                    revenueMap.set(item.name, currentRevenue + (item.qty * item.price));
                 }
+            }
+            
+            // Сортируем: сначала товары с выручкой (в порядке убывания), затем нулевые
+            return [...data].sort((a, b) => {
+                const revenueA = revenueMap.get(a.name) || 0;
+                const revenueB = revenueMap.get(b.name) || 0;
+                const isOutOfStockA = (a.stock || 0) === 0;
+                const isOutOfStockB = (b.stock || 0) === 0;
+                
+                // Закончившиеся товары внизу
+                if (isOutOfStockA && !isOutOfStockB) return 1;
+                if (!isOutOfStockA && isOutOfStockB) return -1;
+                
+                // Сортируем по выручке (убывание)
+                return revenueB - revenueA;
             });
         }
 
-        // ========== СОРТИРОВКА ==========
         function saveCustomOrder() {
             const order = [];
             document.querySelectorAll('#cards-container .card').forEach(card => {
@@ -4232,6 +4274,7 @@
             }
             dragStartIndex = null;
         }
+
         function filterAndSort() {
             let filtered = [...originalCardsData];
 
@@ -4245,7 +4288,7 @@
             }
 
             // Применяем сортировку
-            if (currentSortBy !== 'none' && currentSortBy !== 'custom') {
+            if (currentSortBy !== 'none') {
                 switch (currentSortBy) {
                     case 'name':
                         filtered.sort((a, b) => a.name.localeCompare(b.name));
@@ -4266,11 +4309,12 @@
                         filtered.sort((a, b) => (a.type || '').localeCompare(b.type || ''));
                         break;
                     case 'relevance':
-                        // По релевантности (по умолчанию оставляем как есть)
+                        filtered = sortByRevenue(filtered);
+                        break;
+                    case 'custom':
+                        filtered = applyCustomOrder(filtered);
                         break;
                 }
-            } else if (currentSortBy === 'custom') {
-                filtered = applyCustomOrder(filtered);
             }
 
             currentFilteredData = filtered;
@@ -4368,7 +4412,7 @@
 
             const sortOptions = [
                 { value: "none", label: "Без сортировки" },
-                { value: "relevance", label: "По релевантности" },
+                { value: "relevance", label: "По выручке" },
                 { value: "name", label: "По названию" },
                 { value: "stock", label: "По остатку: сначала мало" },
                 { value: "stockDesc", label: "По остатку: сначала много" },
@@ -4625,6 +4669,7 @@
             document.querySelectorAll('.sort-option').forEach(opt => opt.classList.remove('active'));
             filterAndSort();
         }
+
         // ========== АУТЕНТИФИКАЦИЯ ==========
         function checkPasswordAndLogin() {
             const passwordInput = document.getElementById('passwordInput');
