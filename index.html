@@ -47,6 +47,7 @@
             --profit-negative: #e74c3c;
             --extra-costs-text-light: #5a3a1a;
             --extra-costs-text-dark: #ffffff;
+            --settings-bg: #f39c12;
         }
 
         body.dark {
@@ -86,6 +87,7 @@
             --profit-negative: #e74c3c;
             --extra-costs-text-light: #f5e6c4;
             --extra-costs-text-dark: #ffffff;
+            --settings-bg: #e67e22;
         }
 
         body {
@@ -102,6 +104,7 @@
             align-items: center;
             justify-content: space-between;
             margin-bottom: 4px;
+            gap: 10px;
         }
 
         .title-area {
@@ -135,10 +138,35 @@
             font-size: 13px;
         }
 
+        .header-buttons {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .icon-btn {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            font-size: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 8px var(--shadow);
+            flex-shrink: 0;
+        }
+
+        .icon-btn:active {
+            transform: scale(0.95);
+        }
+
         .theme-toggle {
             background: var(--card-bg);
             border: 1px solid var(--border-color);
-            border-radius: 30px;
+            border-radius: 50%;
             width: 40px;
             height: 40px;
             font-size: 20px;
@@ -458,6 +486,11 @@
             position: relative;
             transition: all 0.2s ease;
             cursor: grab;
+            touch-action: none;
+        }
+
+        .card:active {
+            cursor: grabbing;
         }
 
         .card.dragging {
@@ -1133,6 +1166,45 @@
 
         .login-card input::placeholder {
             color: var(--text-muted);
+        }
+
+        .password-wrapper {
+            position: relative;
+            width: 100%;
+            margin-bottom: 16px;
+        }
+
+        .password-wrapper input {
+            width: 100%;
+            padding: 12px;
+            font-size: 16px;
+            border: 1px solid var(--border-color);
+            border-radius: 30px;
+            outline: none;
+            text-align: center;
+            background: var(--card-bg);
+            color: var(--text-primary);
+            padding-right: 45px;
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 20px;
+            padding: 0;
+            width: auto;
+            height: auto;
+            box-shadow: none;
+            color: var(--text-muted);
+        }
+
+        .toggle-password:active {
+            transform: translateY(-50%) scale(0.95);
         }
 
         .rule-custom-select {
@@ -2117,6 +2189,76 @@
         body.dark .detail-table th {
             background: var(--badge-bg);
         }
+
+        .settings-menu {
+            position: relative;
+        }
+
+        .settings-dropdown {
+            position: absolute;
+            top: 50px;
+            right: 0;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 12px;
+            min-width: 220px;
+            z-index: 300;
+            box-shadow: 0 4px 12px var(--shadow);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .settings-dropdown.hidden {
+            display: none;
+        }
+
+        .settings-btn {
+            background: var(--card-bg);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+            border-radius: 30px;
+            padding: 10px 16px;
+            font-size: 14px;
+            cursor: pointer;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        .settings-btn.logout {
+            background: var(--minus-bg);
+            color: var(--minus-color);
+        }
+
+        .settings-toggle {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            font-size: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 8px var(--shadow);
+            flex-shrink: 0;
+        }
+
+        .participant-select {
+            width: 100%;
+            padding: 8px 12px;
+            border-radius: 30px;
+            border: 1px solid var(--border-color);
+            background: var(--card-bg);
+            color: var(--text-primary);
+            font-size: 14px;
+            margin-bottom: 16px;
+        }
     </style>
 </head>
 <body>
@@ -2133,7 +2275,10 @@
             
             <input type="text" id="loginInput" style="width:100%; padding:12px; font-size:16px; border:1px solid var(--border-color); border-radius:30px; outline:none; margin-bottom:12px; text-align:center; background:var(--card-bg); color:var(--text-primary);" placeholder="Логин" autofocus>
             
-            <input type="password" id="passwordInput" style="width:100%; padding:12px; font-size:16px; border:1px solid var(--border-color); border-radius:30px; outline:none; margin-bottom:16px; text-align:center; background:var(--card-bg); color:var(--text-primary);" placeholder="Пароль">
+            <div class="password-wrapper">
+                <input type="password" id="passwordInput" placeholder="Пароль">
+                <button type="button" class="toggle-password" onclick="togglePasswordVisibility()">👁️</button>
+            </div>
             
             <button id="loginBtn" style="background:var(--btn-bg); color:white; border:none; border-radius:30px; padding:12px 24px; font-size:16px; font-weight:500; width:100%; cursor:pointer;">🍌 Войти 🍌</button>
             
@@ -2148,7 +2293,17 @@
                 <h1 id="shopTitle">🍌 Учёт мерча</h1>
                 <span class="beta-badge">beta</span>
             </div>
-            <button class="theme-toggle" id="themeToggle">🌙</button>
+            <div class="header-buttons">
+                <div class="settings-menu">
+                    <button class="settings-toggle" id="settingsToggle">⚙️</button>
+                    <div id="settingsDropdown" class="settings-dropdown hidden">
+                        <button id="shareStatsBtn" class="settings-btn">🔗 Делиться моей статистикой анонимно</button>
+                        <button id="hideStatsBtn" class="settings-btn">🚫 Не учитывать мою статистику</button>
+                        <button id="logoutBtn" class="settings-btn logout">🚪 Выйти</button>
+                    </div>
+                </div>
+                <button class="theme-toggle" id="themeToggle">🌙</button>
+            </div>
         </div>
         <div class="sub">Всё на благо ясгу фд! Всё на благо ясгу фд!</div>
 
@@ -2157,7 +2312,7 @@
             <button class="refresh-btn" id="rulesButton">📋 Правила</button>
             <button class="history-btn" onclick="showHistory()">📜 История</button>
             <button class="refresh-btn" id="statsButton">📊 Статистика</button>
-            <button class="refresh-btn" onclick="logout()" style="background: var(--minus-bg); color: var(--minus-color);">🚪 Выйти</button>
+            <button class="refresh-btn" id="globalStatsBtn" style="display: none;">📊 Статистика всех</button>
         </div>
 
         <div id="progressContainer" class="progress-container">
@@ -2191,7 +2346,6 @@
             Намяукано | <a id="sheetLink" href="#" target="_blank">Синхронизация с таблицей</a>
         </div>
     </div>
-
     <!-- Cart Modal -->
     <div id="cartModal" class="modal cart-modal">
         <div class="modal-content">
@@ -2321,6 +2475,19 @@
         </div>
     </div>
 
+    <!-- Global Stats Modal -->
+    <div id="globalStatsModal" class="modal">
+        <div class="modal-content" style="max-width: 1000px;">
+            <button class="modal-close-btn" onclick="closeGlobalStatsModal()">×</button>
+            <div class="modal-header">
+                <span>📊 Статистика всех участников</span>
+            </div>
+            <div id="globalStats-content">
+                <div class="loading">Загрузка статистики...</div>
+            </div>
+        </div>
+    </div>
+
     <!-- Edit Product Modal -->
     <div id="editProductModal" class="modal edit-product-modal">
         <div class="modal-content">
@@ -2353,13 +2520,102 @@
             id: null,
             name: null,
             role: null,
-            sheetUrl: null
+            sheetUrl: null,
+            shareStats: true,
+            hideStats: false
         };
         
         // Функция для построения URL с параметром participant
         function buildApiUrl(action, extraParams = "") {
             if (!CURRENT_USER.id) return "#";
             return `${CENTRAL_API_URL}?action=${action}&participant=${CURRENT_USER.id}${extraParams}&t=${Date.now()}`;
+        }
+        
+        // ========== НАСТРОЙКИ КОНФИДЕНЦИАЛЬНОСТИ ==========
+        async function savePrivacySettings() {
+            try {
+                const data = encodeURIComponent(JSON.stringify({
+                    shareStats: CURRENT_USER.shareStats,
+                    hideStats: CURRENT_USER.hideStats
+                }));
+                await fetch(buildApiUrl("savePrivacy", `&data=${data}`));
+            } catch(e) {
+                console.error(e);
+            }
+        }
+        
+        async function loadPrivacySettings() {
+            try {
+                const response = await fetch(buildApiUrl("getPrivacy"));
+                const data = await response.json();
+                if (data) {
+                    CURRENT_USER.shareStats = data.shareStats !== undefined ? data.shareStats : true;
+                    CURRENT_USER.hideStats = data.hideStats !== undefined ? data.hideStats : false;
+                    updatePrivacyButtonsUI();
+                }
+            } catch(e) {
+                // Используем локальные настройки
+                const saved = localStorage.getItem('merch_privacy');
+                if (saved) {
+                    const parsed = JSON.parse(saved);
+                    CURRENT_USER.shareStats = parsed.shareStats !== undefined ? parsed.shareStats : true;
+                    CURRENT_USER.hideStats = parsed.hideStats !== undefined ? parsed.hideStats : false;
+                    updatePrivacyButtonsUI();
+                }
+            }
+        }
+        
+        function updatePrivacyButtonsUI() {
+            const shareBtn = document.getElementById('shareStatsBtn');
+            const hideBtn = document.getElementById('hideStatsBtn');
+            if (shareBtn) {
+                shareBtn.innerHTML = CURRENT_USER.shareStats ? '🔗 Делиться моей статистикой анонимно ✅' : '🔗 Делиться моей статистикой анонимно';
+                shareBtn.style.opacity = CURRENT_USER.shareStats ? '1' : '0.7';
+            }
+            if (hideBtn) {
+                hideBtn.innerHTML = CURRENT_USER.hideStats ? '🚫 Не учитывать мою статистику ✅' : '🚫 Не учитывать мою статистику';
+                hideBtn.style.opacity = CURRENT_USER.hideStats ? '1' : '0.7';
+            }
+        }
+        
+        function toggleShareStats() {
+            CURRENT_USER.shareStats = !CURRENT_USER.shareStats;
+            if (CURRENT_USER.shareStats && CURRENT_USER.hideStats) {
+                CURRENT_USER.hideStats = false;
+            }
+            updatePrivacyButtonsUI();
+            localStorage.setItem('merch_privacy', JSON.stringify({
+                shareStats: CURRENT_USER.shareStats,
+                hideStats: CURRENT_USER.hideStats
+            }));
+            savePrivacySettings();
+            showToast(CURRENT_USER.shareStats ? 'Анонимная статистика включена' : 'Анонимная статистика отключена', true);
+        }
+        
+        function toggleHideStats() {
+            CURRENT_USER.hideStats = !CURRENT_USER.hideStats;
+            if (CURRENT_USER.hideStats && CURRENT_USER.shareStats) {
+                CURRENT_USER.shareStats = false;
+            }
+            updatePrivacyButtonsUI();
+            localStorage.setItem('merch_privacy', JSON.stringify({
+                shareStats: CURRENT_USER.shareStats,
+                hideStats: CURRENT_USER.hideStats
+            }));
+            savePrivacySettings();
+            showToast(CURRENT_USER.hideStats ? 'Ваша статистика скрыта от организатора' : 'Ваша статистика видна организатору', true);
+        }
+        
+        function togglePasswordVisibility() {
+            const passwordInput = document.getElementById('passwordInput');
+            const toggleBtn = document.querySelector('.toggle-password');
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                toggleBtn.textContent = '🙈';
+            } else {
+                passwordInput.type = 'password';
+                toggleBtn.textContent = '👁️';
+            }
         }
         
         // ========== ВХОД ==========
@@ -2392,6 +2648,8 @@
                     localStorage.setItem(`auth_user`, login);
                     localStorage.setItem(`auth_time`, Date.now());
                     
+                    await loadPrivacySettings();
+                    
                     document.getElementById('loginOverlay').style.display = 'none';
                     document.getElementById('mainContent').style.display = 'block';
                     
@@ -2404,7 +2662,8 @@
                     }
                     
                     if (CURRENT_USER.role === 'organizer') {
-                        addGlobalStatsButton();
+                        const globalStatsBtn = document.getElementById('globalStatsBtn');
+                        if (globalStatsBtn) globalStatsBtn.style.display = 'inline-flex';
                     }
                     
                     initApp();
@@ -2419,56 +2678,132 @@
                 console.error(error);
             }
         }
-        
-        function addGlobalStatsButton() {
-            const buttonsDiv = document.querySelector('#mainContent > div:first-child');
-            if (buttonsDiv && !document.getElementById('globalStatsBtn')) {
-                const btn = document.createElement('button');
-                btn.id = 'globalStatsBtn';
-                btn.className = 'refresh-btn';
-                btn.innerHTML = '📊 Статистика всех';
-                btn.onclick = showGlobalStats;
-                buttonsDiv.appendChild(btn);
-            }
-        }
-        
         async function showGlobalStats() {
-            showToast("Загрузка статистики всех участников...", true);
+            const modal = document.getElementById('globalStatsModal');
+            if (!modal) return;
+            modal.style.display = 'block';
+            const container = document.getElementById('globalStats-content');
+            container.innerHTML = '<div class="loading">Загрузка статистики всех участников...</div>';
+            
             try {
                 const response = await fetch(`${CENTRAL_API_URL}?action=getAllStats&participant=${CURRENT_USER.id}`);
                 const data = await response.json();
-                showModal(renderGlobalStatsModal(data));
+                
+                let participantsList = data.participants || [];
+                let selectedParticipant = null;
+                
+                let html = `
+                    <select id="participantSelect" class="participant-select" onchange="loadSelectedParticipantStats(this.value)">
+                        <option value="all">📊 Все участники</option>
+                        ${participantsList.map(p => `<option value="${escapeHtml(p.id)}">${escapeHtml(p.name)} (${p.role === 'organizer' ? 'Организатор' : 'Художник'})</option>`).join('')}
+                    </select>
+                    <div id="participantStatsContainer">
+                        ${renderAllParticipantsStatsTable(data.stats || [])}
+                    </div>
+                `;
+                container.innerHTML = html;
             } catch(e) {
+                container.innerHTML = '<div class="loading">Ошибка загрузки статистики</div>';
                 showToast("Ошибка загрузки статистики", false);
             }
         }
         
-        function renderGlobalStatsModal(stats) {
+        function renderAllParticipantsStatsTable(stats) {
             let html = '<h3>📊 Статистика всех участников</h3><table class="detail-table">';
-            html += '<thead><tr><th>Участник</th><th>Роль</th><th>Остатков на сумму</th><th>Всего товаров</th></tr></thead><tbody>';
-            for (const s of stats.stats || []) {
+            html += '<thead><tr>';
+            html += '<th>Участник</th><th>Роль</th><th class="text-right">Выручка</th><th class="text-right">Чистая прибыль</th>';
+            html += '<th class="text-right">Продано единиц</th><th class="text-right">Всего товаров</th>';
+            html += '<th class="text-right">Средний чек</th><th class="text-right">Рентабельность</th>';
+            html += '</tr></thead><tbody>';
+            for (const s of stats) {
+                if (s.hideStats === true) continue;
+                const profitClass = (s.netProfit || 0) >= 0 ? 'profit-positive' : 'profit-negative';
+                const marginClass = (s.profitMargin || 0) >= 0 ? 'profit-positive' : 'profit-negative';
                 html += `<tr>
-                            <td>${escapeHtml(s.name)}</td>
-                            <td>${s.role === 'organizer' ? 'Организатор' : 'Художник'}</td>
-                            <td class="text-right">${(s.totalValue || 0).toLocaleString()} ₽</td>
-                            <td class="text-right">${s.totalItems || 0} шт</td>
-                          </tr>`;
+                             <td>${escapeHtml(s.name)}</td>
+                             <td>${s.role === 'organizer' ? 'Организатор' : 'Художник'}</td>
+                            <td class="text-right">${(s.totalRevenue || 0).toLocaleString()} ₽</td>
+                            <td class="text-right ${profitClass}">${(s.netProfit || 0).toLocaleString()} ₽</td>
+                            <td class="text-right">${(s.totalItemsSold || 0).toLocaleString()} шт</td>
+                            <td class="text-right">${(s.totalGoods || 0).toLocaleString()} шт</td>
+                            <td class="text-right">${(s.averageCheck || 0).toLocaleString()} ₽</td>
+                            <td class="text-right ${marginClass}">${(s.profitMargin || 0).toFixed(1)}%</td>
+                           </tr>`;
             }
-            html += '</tbody></tr>';
+            if (stats.filter(s => !s.hideStats).length === 0) {
+                html += '<tr><td colspan="8" class="text-right">Нет данных для отображения</td></tr>';
+            }
+            html += '</tbody></table>';
             return html;
         }
         
-        function showModal(content) {
-            let modal = document.getElementById('customModal');
-            if (!modal) {
-                modal = document.createElement('div');
-                modal.id = 'customModal';
-                modal.className = 'modal';
-                modal.innerHTML = `<div class="modal-content"><button class="modal-close-btn" onclick="this.closest('.modal').style.display='none'">×</button><div id="modalBody"></div></div>`;
-                document.body.appendChild(modal);
+        async function loadSelectedParticipantStats(participantId) {
+            const container = document.getElementById('participantStatsContainer');
+            if (!container) return;
+            container.innerHTML = '<div class="loading">Загрузка...</div>';
+            
+            try {
+                let url;
+                if (participantId === 'all') {
+                    url = `${CENTRAL_API_URL}?action=getAllStats&participant=${CURRENT_USER.id}`;
+                } else {
+                    url = `${CENTRAL_API_URL}?action=getUserStats&participant=${CURRENT_USER.id}&targetUser=${encodeURIComponent(participantId)}`;
+                }
+                const response = await fetch(url);
+                const data = await response.json();
+                
+                if (participantId === 'all') {
+                    container.innerHTML = renderAllParticipantsStatsTable(data.stats || []);
+                } else {
+                    container.innerHTML = renderSingleParticipantStats(data);
+                }
+            } catch(e) {
+                container.innerHTML = '<div class="loading">Ошибка загрузки</div>';
             }
-            document.getElementById('modalBody').innerHTML = content;
-            modal.style.display = 'block';
+        }
+        
+        function renderSingleParticipantStats(stats) {
+            const profitClass = (stats.netProfit || 0) >= 0 ? 'profit-positive' : 'profit-negative';
+            const marginClass = (stats.profitMargin || 0) >= 0 ? 'profit-positive' : 'profit-negative';
+            
+            let html = `
+                <div class="stats-grid">
+                    <div class="stats-card"><div class="stats-card-value">${(stats.totalRevenue || 0).toLocaleString()} ₽</div><div class="stats-card-label">💰 Выручка</div></div>
+                    <div class="stats-card"><div class="stats-card-value">${(stats.totalCost || 0).toLocaleString()} ₽</div><div class="stats-card-label">📦 Себестоимость</div></div>
+                    <div class="stats-card"><div class="stats-card-value ${profitClass}">${(stats.netProfit || 0).toLocaleString()} ₽</div><div class="stats-card-label">📈 Чистая прибыль</div></div>
+                    <div class="stats-card"><div class="stats-card-value">${(stats.totalItemsSold || 0).toLocaleString()} шт</div><div class="stats-card-label">📊 Продано единиц</div></div>
+                    <div class="stats-card"><div class="stats-card-value">${(stats.totalGoods || 0).toLocaleString()} шт</div><div class="stats-card-label">📦 Всего товаров</div></div>
+                    <div class="stats-card"><div class="stats-card-value">${(stats.averageCheck || 0).toLocaleString()} ₽</div><div class="stats-card-label">💳 Средний чек</div></div>
+                </div>
+                <div class="stats-summary-compact"><div class="stats-summary-value ${marginClass}">${(stats.profitMargin || 0).toFixed(1)}%</div><div class="stats-summary-label">Рентабельность продаж</div></div>
+            `;
+            
+            if (stats.productDetails && stats.productDetails.length > 0) {
+                html += `<div class="detail-section"><div class="detail-title">📦 Детализация по товарам</div>
+                <table class="detail-table">
+                    <thead><tr><th>Товар</th><th>Тип</th><th class="text-right">Кол-во</th><th class="text-right">Выручка</th><th class="text-right">Прибыль</th><th class="text-right">Рентаб.</th></tr></thead>
+                    <tbody>`;
+                for (const p of stats.productDetails) {
+                    const pProfitClass = (p.profit || 0) >= 0 ? 'profit-positive' : 'profit-negative';
+                    const pMarginClass = (p.margin || 0) >= 0 ? 'profit-positive' : 'profit-negative';
+                    html += `<tr>
+                                <td>${escapeHtml(p.name)}</td>
+                                <td><span class="type-badge" style="background:${getTypeColor(p.type)}20; color:${getTypeColor(p.type)};">${escapeHtml(p.type)}</span></td>
+                                <td class="text-right">${p.qty} шт</td>
+                                <td class="text-right">${(p.revenue || 0).toLocaleString()} ₽</td>
+                                <td class="text-right ${pProfitClass}">${(p.profit || 0).toLocaleString()} ₽</td>
+                                <td class="text-right ${pMarginClass}">${(p.margin || 0).toFixed(1)}%</td>
+                               </tr>`;
+                }
+                html += '</tbody></table></div>';
+            }
+            
+            return html;
+        }
+        
+        function closeGlobalStatsModal() {
+            const modal = document.getElementById('globalStatsModal');
+            if (modal) modal.style.display = 'none';
         }
         
         function logout() {
@@ -2480,6 +2815,8 @@
             document.getElementById('loginInput').value = '';
             document.getElementById('passwordInput').value = '';
             document.getElementById('errorMsg').style.display = 'none';
+            const dropdown = document.getElementById('settingsDropdown');
+            if (dropdown) dropdown.classList.add('hidden');
         }
         
         function checkExistingAuth() {
@@ -2509,6 +2846,9 @@
 
         let customOrder = [];
         let dragStartIndex = null;
+        let dragStartX = null;
+        let dragStartY = null;
+        let isDragging = false;
 
         let selectedDiscountProducts = new Set();
         let discountProductListVisible = false;
@@ -2919,7 +3259,6 @@
                 showToast("Вся история очищена", true);
             }
         }
-
         // ========== ПРАВИЛА ==========
         let rulesList = [];
         let currentRuleType = "type";
@@ -3517,7 +3856,7 @@
             });
         }
 
-        // ========== ПОЛЬЗОВАТЕЛЬСКИЙ ПОРЯДОК ==========
+        // ========== ПОЛЬЗОВАТЕЛЬСКИЙ ПОРЯДОК (с поддержкой touch) ==========
         function saveCustomOrder() {
             const order = [];
             document.querySelectorAll('#cards-container .card').forEach(card => {
@@ -3594,21 +3933,30 @@
             return ordered;
         }
 
-        // ========== DRAG & DROP ==========
+        // ========== DRAG & DROP с поддержкой touch для мобильных ==========
         function dragStartHandler(e, index) {
             dragStartIndex = index;
-            e.target.closest('.card')?.classList.add('dragging');
+            const card = e.target.closest('.card');
+            if (card) {
+                card.classList.add('dragging');
+                if (e.dataTransfer) {
+                    e.dataTransfer.effectAllowed = 'move';
+                    e.dataTransfer.setData('text/plain', index);
+                }
+            }
         }
 
         function dragEndHandler(e) {
-            e.target.closest('.card')?.classList.remove('dragging');
+            const card = e.target.closest('.card');
+            if (card) card.classList.remove('dragging');
             dragStartIndex = null;
+            isDragging = false;
         }
 
         function dragOverHandler(e) {
             e.preventDefault();
             const card = e.target.closest('.card');
-            if (card) card.classList.add('drag-over');
+            if (card && dragStartIndex !== null) card.classList.add('drag-over');
         }
 
         function dragLeaveHandler(e) {
@@ -3638,6 +3986,70 @@
                 syncCustomOrderToServer();
             }
             dragStartIndex = null;
+        }
+
+        // Touch события для мобильных устройств
+        function touchStartHandler(e, index) {
+            e.preventDefault();
+            dragStartIndex = index;
+            isDragging = true;
+            const touch = e.touches[0];
+            dragStartX = touch.clientX;
+            dragStartY = touch.clientY;
+            const card = e.target.closest('.card');
+            if (card) card.classList.add('dragging');
+        }
+
+        function touchMoveHandler(e) {
+            if (!isDragging || dragStartIndex === null) return;
+            e.preventDefault();
+            const touch = e.touches[0];
+            const currentX = touch.clientX;
+            const currentY = touch.clientY;
+            const deltaX = Math.abs(currentX - dragStartX);
+            const deltaY = Math.abs(currentY - dragStartY);
+            if (deltaX < 10 && deltaY < 10) return;
+            
+            const element = document.elementFromPoint(currentX, currentY);
+            const targetCard = element?.closest('.card');
+            if (targetCard && currentSortBy === 'custom') {
+                const cards = document.querySelectorAll('#cards-container .card');
+                let dropIndex = -1;
+                for (let i = 0; i < cards.length; i++) {
+                    if (cards[i] === targetCard) {
+                        dropIndex = i;
+                        break;
+                    }
+                }
+                if (dropIndex !== -1 && dragStartIndex !== dropIndex) {
+                    const cardsArray = [...currentFilteredData];
+                    const [movedCard] = cardsArray.splice(dragStartIndex, 1);
+                    cardsArray.splice(dropIndex, 0, movedCard);
+                    currentFilteredData = cardsArray;
+                    renderCards();
+                    dragStartIndex = dropIndex;
+                    
+                    const newOrder = [];
+                    currentFilteredData.forEach(card => {
+                        const originalIndex = originalCardsData.findIndex(orig => orig.name === card.name && orig.type === card.type);
+                        if (originalIndex !== -1) newOrder.push(originalIndex);
+                    });
+                    customOrder = newOrder;
+                    localStorage.setItem('merch_custom_order', JSON.stringify(customOrder));
+                    syncCustomOrderToServer();
+                }
+            }
+        }
+
+        function touchEndHandler(e) {
+            if (!isDragging) return;
+            e.preventDefault();
+            const card = e.target.closest('.card');
+            if (card) card.classList.remove('dragging');
+            dragStartIndex = null;
+            isDragging = false;
+            dragStartX = null;
+            dragStartY = null;
         }
 
         // ========== ФИЛЬТРАЦИЯ И СОРТИРОВКА ОСНОВНАЯ ==========
@@ -3714,11 +4126,16 @@
                 cardDiv.setAttribute('data-index', displayIndex);
 
                 if (currentSortBy === 'custom') {
+                    // Mouse events
                     cardDiv.addEventListener('dragstart', (e) => dragStartHandler(e, displayIndex));
                     cardDiv.addEventListener('dragend', dragEndHandler);
                     cardDiv.addEventListener('dragover', dragOverHandler);
                     cardDiv.addEventListener('dragleave', dragLeaveHandler);
                     cardDiv.addEventListener('drop', (e) => dropHandler(e, displayIndex));
+                    // Touch events for mobile
+                    cardDiv.addEventListener('touchstart', (e) => touchStartHandler(e, displayIndex));
+                    cardDiv.addEventListener('touchmove', touchMoveHandler);
+                    cardDiv.addEventListener('touchend', touchEndHandler);
                 }
 
                 cardDiv.innerHTML = `
@@ -4574,7 +4991,7 @@
                             ${topByQty.map(([name, data], idx) => `
                                 <tr>
                                     <td class="text-right"><span class="popular-badge">${idx + 1}</span></td>
-                                    <td>${escapeHtml(name)}</td>
+                                    <td>${escapeHtml(name)}</span></td>
                                     <td><span class="type-badge" style="background:${getTypeColor(data.type)}20; color:${getTypeColor(data.type)};">${escapeHtml(data.type)}</span></td>
                                     <td class="text-right">${data.qty} шт</td>
                                 </tr>
@@ -4592,7 +5009,7 @@
                                 <tr>
                                     <td class="text-right"><span class="popular-badge">${idx + 1}</span></td>
                                     <td><span class="type-badge" style="background:${getTypeColor(type)}20; color:${getTypeColor(type)};">${escapeHtml(type)}</span></td>
-                                    <td class="text-right">${data.qty} шт</td>
+                                    <td class="text-right">${data.qty} шт</span></td>
                                 </tr>
                             `).join('')}
                         </tbody>
@@ -4810,6 +5227,47 @@
             loadData(true, true);
             startAutoRefresh();
             startHistoryAutoSync();
+            
+            // Настройки меню
+            const settingsToggle = document.getElementById('settingsToggle');
+            const settingsDropdown = document.getElementById('settingsDropdown');
+            const shareStatsBtn = document.getElementById('shareStatsBtn');
+            const hideStatsBtn = document.getElementById('hideStatsBtn');
+            const logoutBtn = document.getElementById('logoutBtn');
+            
+            if (settingsToggle) {
+                settingsToggle.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    settingsDropdown.classList.toggle('hidden');
+                });
+            }
+            
+            if (shareStatsBtn) {
+                shareStatsBtn.addEventListener('click', () => {
+                    toggleShareStats();
+                    settingsDropdown.classList.add('hidden');
+                });
+            }
+            
+            if (hideStatsBtn) {
+                hideStatsBtn.addEventListener('click', () => {
+                    toggleHideStats();
+                    settingsDropdown.classList.add('hidden');
+                });
+            }
+            
+            if (logoutBtn) {
+                logoutBtn.addEventListener('click', () => {
+                    logout();
+                    settingsDropdown.classList.add('hidden');
+                });
+            }
+            
+            document.addEventListener('click', (e) => {
+                if (settingsDropdown && !settingsToggle?.contains(e.target) && !settingsDropdown.contains(e.target)) {
+                    settingsDropdown.classList.add('hidden');
+                }
+            });
         }
 
         // ========== ОБРАБОТЧИКИ СОБЫТИЙ ==========
@@ -4824,6 +5282,7 @@
             if (event.target === document.getElementById('cartModal')) closeCartModal();
             if (event.target === document.getElementById('rulesModal')) closeRulesModal();
             if (event.target === document.getElementById('statsModal')) closeStatsModal();
+            if (event.target === document.getElementById('globalStatsModal')) closeGlobalStatsModal();
             if (event.target === document.getElementById('editProductModal')) closeEditProductModal();
         };
 
@@ -4863,6 +5322,9 @@
 
             const statsBtn = document.getElementById('statsButton');
             if (statsBtn) statsBtn.addEventListener('click', openStatsModal);
+            
+            const globalStatsBtn = document.getElementById('globalStatsBtn');
+            if (globalStatsBtn) globalStatsBtn.addEventListener('click', showGlobalStats);
 
             checkExistingAuth();
         });
